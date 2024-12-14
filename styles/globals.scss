@@ -1,0 +1,41 @@
+/* global-variables-and-mixins */
+$backgroundColorFromColorMain: white;
+$borderRadius: 5px;
+$colorMain: white;
+
+@mixin fontBase($fontFamily: "Barlow Semi Condensed", $fontSize: 1.6rem, $fontWeight: 400, $fontColor: $colorMain) {
+    font-family: $fontFamily, sans-serif;
+    font-size: $fontSize;
+    font-weight: $fontWeight;
+    color: $fontColor;
+}
+@mixin borderType1($borderColor: $backgroundColorFromColorMain) {
+    border-radius: $borderRadius;
+    border: 2px solid $borderColor;
+}
+@mixin backgroundColorFromGradientConst($opacity) {
+    background-color: rgba(10,10,40,$opacity);
+}
+@mixin d-flex-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+@mixin d-flex-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+}
+/* /global-variables-and-mixins */
+
+/* simple-css-reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    outline: none;
+    overflow: hidden;
+}
+/* /simple-css-reset */

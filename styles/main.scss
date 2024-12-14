@@ -1,0 +1,74 @@
+@use 'globals';
+
+/* app-css */
+html {
+    font-size: 62.5%;
+}
+
+body {
+    @include globals.fontBase;
+
+    background: rgb(34,34,126);
+    background: -moz-radial-gradient(at top, rgba(34,34,126,1) 0%, rgba(10,10,40,1) 65%);
+    background: -webkit-radial-gradient(at top, rgba(34,34,126,1) 0%, rgba(10,10,40,1) 65%);
+    background: radial-gradient(at top, rgba(34,34,126,1) 0%, rgba(10,10,40,1) 65%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#22227e",endColorstr="#0a0a28",GradientType=1);
+
+    height: 100vh;
+    min-height: 100vh;
+    width: 100vw;
+    min-width: 100vw;
+
+    color: globals.$colorMain;
+}
+
+.container {
+    margin: 0 auto;
+    margin-top: 20px;
+    max-width: 900px;
+
+    & .header {
+        width: 100%;
+        min-width: 100%;
+        padding: 15px 20px;
+
+        @include globals.borderType1;
+        @include globals.d-flex-row;
+
+        & .header--span {
+            display: block;
+            line-height: 2.8rem;
+        }
+
+        & .leaderboard {
+            min-height: 80px;
+            font-weight: 900;
+            @include globals.d-flex-column;
+
+            & > span {
+                display: block;
+            }
+
+            & .leaderboard--span {
+                font-size: 2.2rem;
+                letter-spacing: 2px;
+
+                & + .leaderboard--span__score {
+                    font-size: 5.4rem;
+                }
+            }
+        }
+    }
+
+    .game {
+        margin: 0 auto;
+        margin-top: 20px;
+        max-width: 900px;
+        min-height: 500px;
+        @include globals.backgroundColorFromGradientConst(.25);
+        @include globals.borderType1;
+    }
+}
+
+
+/* /app-css */

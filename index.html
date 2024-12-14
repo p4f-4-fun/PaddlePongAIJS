@@ -9,6 +9,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
 
+    <!-- For all other and apple -->
+    <link rel="icon" type="image/png" sizes="128x128" href="./assets/favicon.png">
+    <link rel="apple-touch-icon" type="image/png" sizes="128x128" href="./assets/favicon.png">
+
     <!-- stylesheets -->
     <link rel="stylesheet" href="./styles/main.css">
     <title>Paddle Pong AI 2D | Vanila JS</title>
@@ -31,7 +35,10 @@
         </header>
         <main>
             <section class="game">
-                <div class="game-container"></div>
+                <div class="game--container">
+                    <canvas id="game--container__canvas" width="896" height="494"></canvas>
+                    <div class="game--container__canvasInput"></div>
+                </div>
             </section>
         </main>
     </div>

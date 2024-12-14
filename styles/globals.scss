@@ -1,7 +1,7 @@
 /* global-variables-and-mixins */
-$backgroundColorFromColorMain: white;
-$borderRadius: 5px;
-$colorMain: white;
+$backgroundColorFromColorMain: #FFFFFF;
+$borderRadius: 4px;
+$colorMain: #FFFFFF;
 
 @mixin fontBase($fontFamily: "Barlow Semi Condensed", $fontSize: 1.6rem, $fontWeight: 400, $fontColor: $colorMain) {
     font-family: $fontFamily, sans-serif;

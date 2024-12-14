@@ -9,6 +9,7 @@ const ctx = canvas.getContext("2d");
 class CGameView {
     constructor() {
         this.renderGameScore();
+        this.renderPlayerNameInputModal();
     }
 
     renderGameScore() {
@@ -16,13 +17,23 @@ class CGameView {
         const score = OCPlayer.playerScore;
         scoreElement.innerHTML = score;
     }
+
+    renderPlayerNameInputModal() {
+        setTimeout(() => {
+            const playerName = OCPlayer.playerName;
+            
+            if(playerName.length < 1 || playerName === "Unknown") {
+                const modalElement = document.querySelector(".game--container__canvasInputModal");
+                modalElement.classList.toggle("hidden");
+            }
+        }, 250);
+    }
 }
 
 class CCursor {
     constructor() {
         this.cursorPositionX = 0;
         this.cursorPositionY = 0;
-
     }
 
     updateCursorPosition (e) {
@@ -35,7 +46,7 @@ class CPlayer {
     #playerLSData = {};  // Local Storage data for player;
     constructor() {
         this.#playerLSData = {
-            playerName: localStorage.getItem("playerName") || "Player 1",
+            playerName: localStorage.getItem("playerName") || "Unknown",
             playerScore: localStorage.getItem("playerScore") || 0, 
         };
     }
@@ -68,6 +79,8 @@ canvas.addEventListener("mousemove", OCCursor.updateCursorPosition);
 // APP FUNCTION
 const initGameLoop = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    
     //requestAnimationFrame(initGameLoop);
 };
 

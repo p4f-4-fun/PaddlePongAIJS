@@ -39,7 +39,7 @@ body {
             line-height: 2.8rem;
         }
 
-        & .leaderboard {
+        & .header--leaderboard {
             min-height: 80px;
             font-weight: 900;
             @include globals.d-flex-column;
@@ -48,11 +48,11 @@ body {
                 display: block;
             }
 
-            & .leaderboard--span {
+            & > .header--leaderboard__span {
                 font-size: 2.2rem;
                 letter-spacing: 2px;
 
-                & + .leaderboard--span__score {
+                & + .header--leaderboard__span__score {
                     font-size: 5.4rem;
                 }
             }
@@ -72,6 +72,7 @@ body {
 
             & > .game--container__canvasInputModal {
                 @include globals.d-flex-column;
+                row-gap: 40px;
                 position: absolute;
                 left: 0;
                 top: 0;
@@ -92,8 +93,41 @@ body {
                     &::placeholder {
                         font-size: 1.6rem;
                         text-align: center;
-                        opacity: .5;
                         color: inherit;
+                    }
+
+                }
+                & > button {
+                    display: block;
+                    background: none;
+                    outline: none;
+                    border: none;
+                    padding: 0 20px;
+                    font-size: 2.4rem;
+                    font-weight: 900;
+                    color: globals.$colorMain;
+                    cursor: pointer;
+                    
+                    &::after {
+                        content: "";
+                        display: block;
+                        position: relative;
+                        left: 0;
+                        top: 0;
+                        height: 2px;
+                        min-height: 2px;
+                        background-color: globals.$colorMain;
+                        scale: 1;
+                        transform: translateX(-120px);
+                        transition: transform 150ms linear, scale 150ms linear;
+
+                    }
+
+                    &:hover {
+                        scale: 1.05;
+                        &::after {
+                            transform: translateX(0px);
+                        }
                     }
 
                 }

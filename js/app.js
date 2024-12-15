@@ -1,32 +1,35 @@
 'use strict';
 
 // GLOBALS
-const canvas = document.getElementById("game--container__canvas");
-const ctx = canvas.getContext("2d");
+const domElementsStack = {
+    canvas: document.getElementById("game--container__canvas"),
+    scoreElement: document.querySelector(".header--leaderboard__span__score"),
+    modalElement: document.querySelector(".game--container__canvasInputModal"),
+};
+const ctx = domElementsStack.canvas.getContext("2d");
 // /GLOBALS
 
 // CLASSES
 class CGameView {
     constructor() {
+        this.isPlayerNameInputModalOpen = true;
         this.renderGameScore();
         this.renderPlayerNameInputModal();
     }
 
     renderGameScore() {
-        const scoreElement = document.querySelector(".leaderboard--span__score");
+        const scoreElement = domElementsStack.scoreElement;
         const score = OCPlayer.playerScore;
         scoreElement.innerHTML = score;
     }
 
     renderPlayerNameInputModal() {
-        setTimeout(() => {
-            const playerName = OCPlayer.playerName;
+        const playerName = OCPlayer.playerName;
             
-            if(playerName.length < 1 || playerName === "Unknown") {
-                const modalElement = document.querySelector(".game--container__canvasInputModal");
-                modalElement.classList.toggle("hidden");
-            }
-        }, 250);
+        if((playerName.length < 1 || playerName === "Unknown") && this.isPlayerNameInputModalOpen) {
+            const modalElement = domElementsStack.modalElement;
+            modalElement.classList.toggle("hidden");
+        }
     }
 }
 
@@ -73,12 +76,12 @@ const OCGameView = new CGameView();
 // /CLASSES
 
 // EVENT BINDINGS
-canvas.addEventListener("mousemove", OCCursor.updateCursorPosition);
+domElementsStack.canvas.addEventListener("mousemove", OCCursor.updateCursorPosition);
 // /EVENT BINDINGS
 
 // APP FUNCTION
 const initGameLoop = () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, domElementsStack.canvas.width, domElementsStack.canvas.height);
     
     
     //requestAnimationFrame(initGameLoop);

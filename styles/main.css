@@ -76,6 +76,15 @@ body {
   display: block;
   line-height: 2.8rem;
 }
+.container .header .header--playerNameBox > pre {
+  font-family: "Barlow Semi Condensed", sans-serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 1.8rem;
+  word-spacing: 4px;
+}
 .container .header .header--leaderboard {
   min-height: 80px;
   font-weight: 900;

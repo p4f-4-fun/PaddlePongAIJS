@@ -39,6 +39,15 @@ body {
             line-height: 2.8rem;
         }
 
+        & .header--playerNameBox {
+            & > pre {
+                @include globals.fontBase;
+                font-weight: 600;
+                font-size: 1.8rem;
+                word-spacing: 4px;
+            }
+        }
+
         & .header--leaderboard {
             min-height: 80px;
             font-weight: 900;

@@ -5,6 +5,7 @@ const dom = document;
 const domElementsStack = {
     canvas: dom.querySelector("#game--container__canvas"),
     scoreElement: dom.querySelector(".header--leaderboard__span__score"),
+    playerNamePreviewElement: dom.querySelector(".header--playerNameBox__span"),
     modalElement: dom.querySelector(".game--container__canvasInputModal"),
     modalElementInput: dom.querySelector("#game--container__canvasInputModal__input"),
     modalElementButton: dom.querySelector("#game--container__canvasInputModal__button"),
@@ -20,25 +21,34 @@ class CGameView {
         this.setTimeoutDuration = 200;
     }
 
-    renderGameScore() {
-        const scoreElement = domElementsStack.scoreElement;
-        const score = OCPlayer.playerScore;
-        scoreElement.innerHTML = score;
+    renderGameScoreOnce() {
+        domElementsStack.scoreElement.innerHTML = OCPlayer.playerScore;
         
         setTimeout(() => {
-            scoreElement.classList.remove("hiddenByTransformXLeft");
+            domElementsStack.scoreElement.classList.remove("hiddenByTransformXLeft");
         }, this.setTimeoutDuration);
+    }
+    renderGameScore() {
+        domElementsStack.scoreElement.innerHTML = OCPlayer.playerScore;
+    }
+
+    renderPlayerNamePreviewOnce() {
+        domElementsStack.playerNamePreviewElement.innerHTML = OCPlayer.playerName;
+    }
+    renderPlayerNamePreview() {
+        if (domElementsStack.modalElementInput.value.length < 1) {
+            OCGameView.renderPlayerNamePreviewOnce();
+        } else {
+            domElementsStack.playerNamePreviewElement.innerHTML = domElementsStack.modalElementInput.value;
+        }
     }
 
     renderPlayerNameInputModal() {
-        const playerName = OCPlayer.playerName;
-
-        if((playerName.length < 1 || playerName === "Unknown") && this.isPlayerNameInputModalOpen) {
-            const modalElement = domElementsStack.modalElement;
-            modalElement.classList.remove("hidden");
+        if((OCPlayer.playerName.length < 1 || OCPlayer.playerName === "Unknown") && this.isPlayerNameInputModalOpen) {
+            domElementsStack.modalElement.classList.remove("hidden");
 
             setTimeout(() => {
-                modalElement.classList.remove("hiddenByTransformXLeft");
+                domElementsStack.modalElement.classList.remove("hiddenByTransformXLeft");
             }, this.setTimeoutDuration);
 
             // change status of modal element to prevent of make it visible again in rendered View
@@ -46,17 +56,15 @@ class CGameView {
         }
     }
     removeViewPlayerNameInputModal() {
-        const modalElement = domElementsStack.modalElement;
-        modalElement.classList.add("hiddenByTransformXRight");
+        domElementsStack.modalElement.classList.add("hiddenByTransformXRight");
 
         setTimeout(() => {
-            modalElement.classList.add("hidden");
+            domElementsStack.modalElement.classList.add("hidden");
         }, this.setTimeoutDuration);
     }
 
 
     prepareGameBoard() {
-        console.log("render game board");
         this.removeViewPlayerNameInputModal();
     }
 
@@ -115,7 +123,8 @@ const OCGameView = new CGameView();
 
 // INIT FUNCTION
 const init = () => {
-    OCGameView.renderGameScore();
+    OCGameView.renderPlayerNamePreviewOnce();
+    OCGameView.renderGameScoreOnce();
     OCGameView.renderPlayerNameInputModal();
 };
 // /INIT FUNCTION
@@ -123,6 +132,10 @@ const init = () => {
 // EVENT BINDINGS
 domElementsStack.canvas.addEventListener("mousemove", OCCursor.updateCursorPosition);
 domElementsStack.modalElementButton.addEventListener("click", OCGameView.playButtonTriggered);
+
+domElementsStack.modalElementInput.addEventListener("input", OCGameView.renderPlayerNamePreview);
+domElementsStack.modalElementInput.addEventListener('propertychange', OCGameView.renderPlayerNamePreview); /* for older browsers */
+
 window.onload = () => init();
 // /EVENT BINDINGS
 

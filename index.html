@@ -27,6 +27,9 @@
                     <span class="header--span">PONG</span>
                     <span class="header--span">AI 2D</span>
                 </h1>
+                <div class="header--playerNameBox">
+                    <pre>Player <span class="header--playerNameBox__span"></span> vs AI</pre>
+                </div>
                 <div class="header--leaderboard">
                     <span class="header--leaderboard__span">Score</span>
                     <span class="header--leaderboard__span__score hiddenByTransformXLeft"></span>
@@ -38,7 +41,7 @@
                 <div class="game--container">
                     <canvas id="game--container__canvas" width="896" height="494"></canvas>
                     <div class="game--container__canvasInputModal hidden hiddenByTransformXLeft">
-                        <input type="text" name="playerName" alt="Player name" placeholder="Enter your player name" id="game--container__canvasInputModal__input" required>
+                        <input type="text" name="playerName" alt="Player name" min="1" minlength="1" placeholder="Enter your player name" id="game--container__canvasInputModal__input" required>
                         <button type="button" id="game--container__canvasInputModal__button">PLAY</button>
                     </div>
                 </div>

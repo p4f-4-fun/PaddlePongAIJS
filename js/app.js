@@ -18,6 +18,11 @@ let gameStatus = {
     isPaused: false,
     isStarted: false,
 };
+const drawProperties = {
+    fontFamily: "Barlow Semi Condensed",
+    fontColor: "#FFFFFF",
+    fontSize: "2.2rem",
+};
 // /GLOBALS
 
 // CLASSES
@@ -81,7 +86,9 @@ class CGameView {
 
     prepareGameBoard() {
         this.removeViewPlayerNameInputModal();
-
+        
+        gameStatus.isStarted = true;
+        gameLoop();
     }
 
     isModalElementInputValueValid() {
@@ -122,13 +129,15 @@ class CGameView {
 
 class CCursor {
     constructor() {
-        this.cursorPositionX = 0;
-        this.cursorPositionY = 0;
+        this.cursorPosition = {
+            x: 0,
+            y: 0,
+        }
     }
 
     updateCursorPosition (Event) {
-        this.cursorPositionX = Event.offsetX;
-        this.cursorPositionY = Event.offsetY;
+        OCCursor.cursorPosition.x = Event.offsetX;
+        OCCursor.cursorPosition.y = Event.offsetY;
     }
 }
 
@@ -158,18 +167,37 @@ class CPlayer {
         localStorage.setItem("playerScore", this.#playerLSData.playerScore);
     }
 }
+
+class CGame {
+    drawPlayersNames() {
+        ctx.fillStyle = `${drawProperties.fontColor}`;
+        ctx.font = `${drawProperties.fontSize} ${drawProperties.fontFamily}`;
+        ctx.fillText(`${OCPlayer.playerName}`, 10, 30);
+        ctx.fillText("AI", 10, 60);
+    }
+    
+    // drawLineDivider() {
+
+    // }
+    drawUI() {
+        //this.drawLineDivider();
+        this.drawPlayersNames();
+    }
+
+}
+// Objects assignment of classes
 const OCPlayer = new CPlayer();
 const OCCursor = new CCursor();
 const OCGameView = new CGameView();
+const OCGame = new CGame();
+// /Objects assignment of classes
 // /CLASSES
 
 // APP FUNCTION
 const gameLoop = () => {
     if (gameStatus.isStarted) {
         ctx.clearRect(0, 0, domElementsStack.canvas.width, domElementsStack.canvas.height);
-        ctx.fillStyle = "red";
-        ctx.fillRect(0, 0, domElementsStack.canvas.width, domElementsStack.canvas.height);
-        console.log("game started but with while");
+        OCGame.drawUI();
         requestAnimationFrame(gameLoop);
     }
 };
@@ -180,8 +208,6 @@ const init = () => {
     OCGameView.renderPlayerNamePreviewOnce();
     OCGameView.renderGameScoreOnce();
     OCGameView.renderPlayerNameInputModal();
-    
-    gameLoop();
 };
 // /INIT FUNCTION
 
@@ -190,7 +216,8 @@ domElementsStack.canvas.addEventListener("mousemove", OCCursor.updateCursorPosit
 domElementsStack.modalElementButton.addEventListener("click", OCGameView.playButtonTriggered);
 
 domElementsStack.modalElementInput.addEventListener("input", OCGameView.renderPlayerNamePreview);
-domElementsStack.modalElementInput.addEventListener('propertychange', OCGameView.renderPlayerNamePreview); /* for older browsers */
+/* for older browsers */
+domElementsStack.modalElementInput.addEventListener('propertychange', OCGameView.renderPlayerNamePreview);
 
 window.onload = () => init();
 // /EVENT BINDINGS

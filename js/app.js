@@ -1,11 +1,14 @@
 'use strict';
 
+localStorage.clear();
+
 // GLOBALS
 const dom = document;
 const domElementsStack = {
     canvas: dom.querySelector("#game--container__canvas"),
     scoreElement: dom.querySelector(".header--leaderboard__span__score"),
     playerNamePreviewElement: dom.querySelector(".header--playerNameBox__span"),
+    gameContainer: dom.querySelector(".game--container"),
     modalElement: dom.querySelector(".game--container__canvasInputModal"),
     modalElementInput: dom.querySelector("#game--container__canvasInputModal__input"),
     modalElementButton: dom.querySelector("#game--container__canvasInputModal__button"),
@@ -50,7 +53,7 @@ class CGameView {
     }
 
     renderPlayerNameInputModal() {
-        if((OCPlayer.playerName.length < 1 || OCPlayer.playerName === "Unknown") && this.isPlayerNameInputModalOpen) {
+        if((OCPlayer.playerName.length < 1 || OCPlayer.playerName === OCPlayer.defaultPlayerName ) && this.isPlayerNameInputModalOpen) {
             domElementsStack.modalElement.classList.remove("hidden");
 
             setTimeout(() => {
@@ -66,12 +69,19 @@ class CGameView {
 
         setTimeout(() => {
             domElementsStack.modalElement.classList.add("hidden");
+
+            domElementsStack.modalElementButton.removeEventListener("click", OCGameView.playButtonTriggered);
+            domElementsStack.modalElement.innerHTML = "";
+            
+            domElementsStack.gameContainer.removeChild(domElementsStack.modalElement);
+
         }, this.setTimeoutDuration);
     }
 
 
     prepareGameBoard() {
         this.removeViewPlayerNameInputModal();
+
     }
 
     isModalElementInputValueValid() {
@@ -96,6 +106,11 @@ class CGameView {
             if (OCGameView.isModalElementInputValueValid()) {
                 // change status of PLAY Button to avoid any (multiple) actions after modal element remove
                 OCGameView.isPlayButtonTriggered = true;
+                
+                // if input with name is valid, then update player's name and prepare game board
+                OCPlayer.playerName = domElementsStack.modalElementInput.value;
+
+                // prepare game canvas and render game now
                 OCGameView.prepareGameBoard();
             }
             else {
@@ -120,8 +135,9 @@ class CCursor {
 class CPlayer {
     #playerLSData = {};  // Local Storage data for player;
     constructor() {
+        this.defaultPlayerName = "Unknown",
         this.#playerLSData = {
-            playerName: localStorage.getItem("playerName") || "Unknown",
+            playerName: localStorage.getItem("playerName") || this.defaultPlayerName,
             playerScore: localStorage.getItem("playerScore") || 0, 
         };
     }

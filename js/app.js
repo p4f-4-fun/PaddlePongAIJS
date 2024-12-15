@@ -40,10 +40,12 @@ class CGameView {
         domElementsStack.playerNamePreviewElement.innerHTML = OCPlayer.playerName;
     }
     renderPlayerNamePreview() {
-        if (domElementsStack.modalElementInput.validity.valueMissing) {
-            OCGameView.renderPlayerNamePreviewOnce();
-        } else {
+        if (OCGameView.isModalElementInputValueValid()) {
             domElementsStack.playerNamePreviewElement.innerHTML = domElementsStack.modalElementInput.value;
+        } else {
+            domElementsStack.modalElementInput.value = "";
+
+            OCGameView.renderPlayerNamePreviewOnce();
         }
     }
 
@@ -72,25 +74,34 @@ class CGameView {
         this.removeViewPlayerNameInputModal();
     }
 
+    isModalElementInputValueValid() {
+        if (!domElementsStack.modalElementInput.validity.valid) {
+            return false;
+        } 
+        else if (domElementsStack.modalElementInput.validity.valueMissing) {
+            return false;
+        }
+        else if (domElementsStack.modalElementInput.value.startsWith(" ")) {
+            return false;
+        } 
+        else {
+            return true;
+        }
+    }
     playButtonTriggered(Event) {
-        if(!this.isPlayButtonTriggered) {
+        if(OCGameView.isPlayButtonTriggered === false) {
             Event.preventDefault();
             Event.stopImmediatePropagation();
-            
-            const inputElement = domElementsStack.modalElementInput;
 
-            if (!inputElement.validity.valid || inputElement.validity.valueMissing) {
-                this.isPlayButtonTriggered = false;
-                // ...
-            }
-            else {
-                // change status of play button to avoid any (multiple) actions after modal element remove
-                this.isPlayButtonTriggered = true;
+            if (OCGameView.isModalElementInputValueValid()) {
+                // change status of PLAY Button to avoid any (multiple) actions after modal element remove
+                OCGameView.isPlayButtonTriggered = true;
                 OCGameView.prepareGameBoard();
             }
+            else {
+                OCGameView.isPlayButtonTriggered = false;
+            }
         }
-
-        
     }
 }
 

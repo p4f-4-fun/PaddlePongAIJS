@@ -29,7 +29,7 @@
                 </h1>
                 <div class="header--leaderboard">
                     <span class="header--leaderboard__span">Score</span>
-                    <span class="header--leaderboard__span__score"></span>
+                    <span class="header--leaderboard__span__score hiddenByTransformXLeft"></span>
                 </div>
             </div>
         </header>
@@ -37,9 +37,9 @@
             <section class="game">
                 <div class="game--container">
                     <canvas id="game--container__canvas" width="896" height="494"></canvas>
-                    <div class="game--container__canvasInputModal hidden">
-                        <input type="text" name="playerName" placeholder="Enter your player name" id="game--container__canvasInputModal__input">
-                        <button type="button" id="game--container__canvasInputModal__btn">PLAY</button>
+                    <div class="game--container__canvasInputModal hidden hiddenByTransformXLeft">
+                        <input type="text" name="playerName" alt="Player name" placeholder="Enter your player name" id="game--container__canvasInputModal__input" required>
+                        <button type="button" id="game--container__canvasInputModal__button">PLAY</button>
                     </div>
                 </div>
             </section>

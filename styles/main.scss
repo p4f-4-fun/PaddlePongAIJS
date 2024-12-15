@@ -54,6 +54,8 @@ body {
 
                 & + .header--leaderboard__span__score {
                     font-size: 5.4rem;
+                    min-height: 66px;
+                    transition: transform globals.$transitionLongDuration globals.$transitionTimingFunction;
                 }
             }
         }
@@ -77,6 +79,7 @@ body {
                 left: 0;
                 top: 0;
                 @include globals.widthHeight100prcnt;
+                transition: all globals.$transitionDuration globals.$transitionTimingFunction;
 
                 & > input {
                     @include globals.borderType2;
@@ -119,7 +122,7 @@ body {
                         background-color: globals.$colorMain;
                         scale: 1;
                         transform: translateX(-120px);
-                        transition: transform 150ms linear, scale 150ms linear;
+                        transition: transform globals.$transitionDuration globals.$transitionTimingFunction, scale globals.$transitionDuration globals.$transitionTimingFunction;
 
                     }
 

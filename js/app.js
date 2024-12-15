@@ -11,6 +11,10 @@ const domElementsStack = {
     modalElementButton: dom.querySelector("#game--container__canvasInputModal__button"),
 };
 const ctx = domElementsStack.canvas.getContext("2d");
+let gameStatus = {
+    isPaused: false,
+    isStarted: false,
+};
 // /GLOBALS
 
 // CLASSES
@@ -75,8 +79,9 @@ class CGameView {
             
             const inputElement = domElementsStack.modalElementInput;
 
-            if (inputElement.validity.valueMissing) {
+            if (!inputElement.validity.valid || inputElement.validity.valueMissing) {
                 this.isPlayButtonTriggered = false;
+                // ...
             }
             else {
                 // change status of play button to avoid any (multiple) actions after modal element remove
@@ -131,11 +136,25 @@ const OCCursor = new CCursor();
 const OCGameView = new CGameView();
 // /CLASSES
 
+// APP FUNCTION
+const gameLoop = () => {
+    if (gameStatus.isStarted) {
+        ctx.clearRect(0, 0, domElementsStack.canvas.width, domElementsStack.canvas.height);
+        ctx.fillStyle = "red";
+        ctx.fillRect(0, 0, domElementsStack.canvas.width, domElementsStack.canvas.height);
+        console.log("game started but with while");
+        requestAnimationFrame(gameLoop);
+    }
+};
+// /APP FUNCTION
+
 // INIT FUNCTION
 const init = () => {
     OCGameView.renderPlayerNamePreviewOnce();
     OCGameView.renderGameScoreOnce();
     OCGameView.renderPlayerNameInputModal();
+    
+    gameLoop();
 };
 // /INIT FUNCTION
 
@@ -149,11 +168,4 @@ domElementsStack.modalElementInput.addEventListener('propertychange', OCGameView
 window.onload = () => init();
 // /EVENT BINDINGS
 
-// APP FUNCTION
-const gameLoop = () => {
-    ctx.clearRect(0, 0, domElementsStack.canvas.width, domElementsStack.canvas.height);
-    ctx.fillStyle = "red";
-    ctx.fillRect(frame*2, frame*4, domElementsStack.canvas.width, domElementsStack.canvas.height);
-    //requestAnimationFrame(gameLoop);
-};
-// /APP FUNCTION
+

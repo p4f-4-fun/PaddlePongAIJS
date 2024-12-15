@@ -36,7 +36,7 @@ class CGameView {
         domElementsStack.playerNamePreviewElement.innerHTML = OCPlayer.playerName;
     }
     renderPlayerNamePreview() {
-        if (domElementsStack.modalElementInput.value.length < 1) {
+        if (domElementsStack.modalElementInput.validity.valueMissing) {
             OCGameView.renderPlayerNamePreviewOnce();
         } else {
             domElementsStack.playerNamePreviewElement.innerHTML = domElementsStack.modalElementInput.value;
@@ -68,14 +68,24 @@ class CGameView {
         this.removeViewPlayerNameInputModal();
     }
 
-    playButtonTriggered(e) {
+    playButtonTriggered(Event) {
         if(!this.isPlayButtonTriggered) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
+            Event.preventDefault();
+            Event.stopImmediatePropagation();
             
-            OCGameView.prepareGameBoard();
+            const inputElement = domElementsStack.modalElementInput;
+
+            if (inputElement.validity.valueMissing) {
+                this.isPlayButtonTriggered = false;
+            }
+            else {
+                // change status of play button to avoid any (multiple) actions after modal element remove
+                this.isPlayButtonTriggered = true;
+                OCGameView.prepareGameBoard();
+            }
         }
-        this.isPlayButtonTriggered = true;
+
+        
     }
 }
 
@@ -85,9 +95,9 @@ class CCursor {
         this.cursorPositionY = 0;
     }
 
-    updateCursorPosition (e) {
-        this.cursorPositionX = e.offsetX;
-        this.cursorPositionY = e.offsetY;
+    updateCursorPosition (Event) {
+        this.cursorPositionX = Event.offsetX;
+        this.cursorPositionY = Event.offsetY;
     }
 }
 
@@ -142,9 +152,8 @@ window.onload = () => init();
 // APP FUNCTION
 const gameLoop = () => {
     ctx.clearRect(0, 0, domElementsStack.canvas.width, domElementsStack.canvas.height);
-    
-    
-    //requestAnimationFrame(initGameLoop);
+    ctx.fillStyle = "red";
+    ctx.fillRect(frame*2, frame*4, domElementsStack.canvas.width, domElementsStack.canvas.height);
+    //requestAnimationFrame(gameLoop);
 };
-gameLoop();
 // /APP FUNCTION

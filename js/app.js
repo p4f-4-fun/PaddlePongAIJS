@@ -13,13 +13,14 @@ const domElementsStack = {
     modalElementInput: dom.querySelector("#game--container__canvasInputModal__input"),
     modalElementButton: dom.querySelector("#game--container__canvasInputModal__button"),
 };
-const ctx = domElementsStack.canvas.getContext("2d");
+const domCtx = domElementsStack.canvas;
+const ctx = domCtx.getContext("2d");
 let gameStatus = {
     isPaused: false,
     isStarted: false,
 };
 const drawProperties = {
-    fontFamily: "Barlow Semi Condensed",
+    fontFamily: "Tahoma, sans-serif",
     fontColor: "#FFFFFF",
     fontSize: "2.2rem",
 };
@@ -130,13 +131,13 @@ class CGameView {
 class CCursor {
     constructor() {
         this.cursorPosition = {
-            x: 0,
+            //x: 0,
             y: 0,
         }
     }
 
     updateCursorPosition (Event) {
-        OCCursor.cursorPosition.x = Event.offsetX;
+        //OCCursor.cursorPosition.x = Event.offsetX;
         OCCursor.cursorPosition.y = Event.offsetY;
     }
 }
@@ -169,19 +170,51 @@ class CPlayer {
 }
 
 class CGame {
+    constructor() {
+        this.paddles = {
+            width: 20,
+            height: 100,
+            playerStaticPositionX: (domCtx.width - 50 /* padding */ - 20 /* paddle width */), 
+            AIStaticPositionX: (0 /* X-axis (from left) */ + 50 /* padding */),
+        }
+    }
     drawPlayersNames() {
         ctx.fillStyle = `${drawProperties.fontColor}`;
         ctx.font = `${drawProperties.fontSize} ${drawProperties.fontFamily}`;
-        ctx.fillText(`${OCPlayer.playerName}`, 10, 30);
-        ctx.fillText("AI", 10, 60);
+
+        // player name draw position
+        ctx.fillText(`${OCPlayer.playerName}`, 460, 25);
+
+        // ai name draw position
+        ctx.fillText("AI", 414, 25);
+    }
+
+    drawPlayerPaddle(playerPaddleX, playerPaddleY) {
+        ctx.fillStyle = `${drawProperties.fontColor}`;
+        ctx.fillRect(playerPaddleX, playerPaddleY, this.paddles.width, this.paddles.height);
+    }
+
+    drawAIPaddle(AIPaddleX, AIPaddleY) {
+        ctx.fillStyle = `${drawProperties.fontColor}`;
+        ctx.fillRect(AIPaddleX, AIPaddleY, this.paddles.width, this.paddles.height);
     }
     
-    // drawLineDivider() {
+    drawLineDivider() {
+        ctx.fillStyle = `${drawProperties.fontColor}`;
+        ctx.fillRect(446, 2, 4, 494);
+    }
 
-    // }
+    drawBall(ballX, ballY) {
+        ctx.fillStyle = `${drawProperties.fontColor}`;
+        ctx.fillRect(ballX, ballY, 10, 10);
+    }
+
     drawUI() {
-        //this.drawLineDivider();
+        this.drawLineDivider();
         this.drawPlayersNames();
+        this.drawPlayerPaddle(this.paddles.playerStaticPositionX, ( OCCursor.cursorPosition.y - (this.paddles.height/2) ) );
+        this.drawAIPaddle(this.paddles.AIStaticPositionX, ( OCCursor.cursorPosition.y - (this.paddles.height/2) ));
+        this.drawBall();
     }
 
 }

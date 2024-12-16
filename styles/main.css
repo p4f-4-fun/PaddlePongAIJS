@@ -32,6 +32,10 @@
   transform: translateX(100vw) !important;
 }
 
+.cursorNone {
+  cursor: none !important;
+}
+
 /* /single classes */
 /* app-css */
 html {
@@ -162,7 +166,7 @@ body {
   font-size: 2.4rem;
   font-weight: 900;
   color: #FFFFFF;
-  cursor: pointer;
+  cursor: pointer !important;
 }
 .container .game > .game--container > .game--container__canvasInputModal > button::after {
   content: "";

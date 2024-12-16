@@ -21,8 +21,18 @@ let gameStatus = {
 };
 const drawProperties = {
     fontFamily: "Tahoma, sans-serif",
+    
     fontColor: "#FFFFFF",
+    fontAlertColor: "#FF0000",
+    
+    fontWeight: "400",
+    fontWeightAlert: "700",
+
     fontSize: "2.2rem",
+    fontSizeAlert: "2.4rem",
+
+    elementsUIColor: "#FFFFFF",
+    elementsUIColorNoticeable: "#FFFF00",
 };
 // /GLOBALS
 
@@ -132,6 +142,14 @@ class CGameView {
         if (gameStatus.isStarted) {
             if (Event.which === 32 || Event.keyCode === 32 || Event.key === " " || Event.code === "Space") {
                 gameStatus.isPaused = gameStatus.isPaused ? false : true;
+
+                if (gameStatus.isPaused) {
+                    ctx.fillStyle = `${drawProperties.fontAlertColor}`;
+                    ctx.font = `${drawProperties.fontWeightAlert} ${drawProperties.fontSizeAlert} ${drawProperties.fontFamily}`;
+            
+                    // ai name draw position
+                    ctx.fillText("Game is paused - press [SPACE] to play", ((domCtx.width / 2) - 225), ((domCtx.height / 2) - 25));
+                }
             }
         }
     }
@@ -183,57 +201,104 @@ class CGame {
         this.paddles = {
             width: 20,
             height: 100,
-            actualPlayerPositionY: 0,
-            playerStartPositionX: (domCtx.width - 50 /* padding */ - 20 /* paddle width */),
-            actualAIPositionY: 0, 
-            AIStartPositionX: (0 /* X-axis (from left) */ + 50 /* padding */),
+
+            player: {
+                startPosX: (domCtx.width - 50 /* padding */ - 20 /* paddle width */),
+                actualPosY: 0,
+            },
+
+            AI: {
+                startPosX: (0 /* X-axis (from left) */ + 50 /* padding */),
+                actualPosY: 0,
+            },
         };
         this.ball = {
             width: 10,
             height: 10,
             weight: 2.5,
-            actualPositionX: 0,
-            actualPositionY: 0,
+            actualPosX: 0,
+            actualPosY: 0,
         };
-        this.timeMultiplier = 1.15;
+        this.lineDivider = {
+            width: 4,
+            halfWidth: 2,
+        };
+        this.velocity = 1.15;
+        this.playerNamesDrawingPosition = {
+            playerName: {
+                posX: 460,
+                posY: 25,
+            },
+            AIName: {
+                posX: 414,
+                posY: 25,
+            }
+        };
     }
     drawPlayersNames() {
-        ctx.fillStyle = `${drawProperties.fontColor}`;
-        ctx.font = `${drawProperties.fontSize} ${drawProperties.fontFamily}`;
+        ctx.fillStyle = `${drawProperties.elementsUIColor}`;
+        ctx.font = `${drawProperties.fontWeight} ${drawProperties.fontSize} ${drawProperties.fontFamily}`;
 
         // player name draw position
-        ctx.fillText(`${OCPlayer.playerName}`, 460, 25);
+        ctx.fillText(`${OCPlayer.playerName}`, this.playerNamesDrawingPosition.playerName.posX, this.playerNamesDrawingPosition.playerName.posY);
 
         // ai name draw position
-        ctx.fillText("AI", 414, 25);
+        ctx.fillText("AI", this.playerNamesDrawingPosition.AIName.posX, this.playerNamesDrawingPosition.AIName.posY);
     }
 
     drawPlayerPaddle(playerPaddleX, playerPaddleY) {
-        ctx.fillStyle = `${drawProperties.fontColor}`;
+        ctx.fillStyle = `${drawProperties.elementsUIColor}`;
         ctx.fillRect(playerPaddleX, playerPaddleY, this.paddles.width, this.paddles.height);
     }
 
     drawAIPaddle(AIPaddleX, AIPaddleY) {
-        ctx.fillStyle = `${drawProperties.fontColor}`;
+        ctx.fillStyle = `${drawProperties.elementsUIColor}`;
         ctx.fillRect(AIPaddleX, AIPaddleY, this.paddles.width, this.paddles.height);
     }
     
     drawLineDivider() {
-        ctx.fillStyle = `${drawProperties.fontColor}`;
-        ctx.fillRect(446, 2, 4, 494);
+        ctx.fillStyle = `${drawProperties.elementsUIColor}`;
+        ctx.fillRect((domCtx.width / 2 - this.lineDivider.halfWidth), 2, this.lineDivider.width, domCtx.height);
     }
 
     drawBall(ballX, ballY) {
-        ctx.fillStyle = `${drawProperties.fontColor}`;
+        ctx.fillStyle = `${drawProperties.elementsUIColor}`;
         ctx.fillRect(ballX, ballY, this.ball.width, this.ball.height);
+    }
+    
+    getCenterOfElement(element) {
+        switch(element) {
+            case "ball":
+                return {
+                    x: this.ball.width / 2,
+                    y: this.ball.height / 2,
+                };
+            case "paddle":
+                return {
+                    x: this.paddles.width / 2,
+                    y: this.paddles.height / 2,
+                };
+            default:
+                return 0;
+        }
     }
 
     drawUI() {
         this.drawLineDivider();
         this.drawPlayersNames();
-        this.drawPlayerPaddle(this.paddles.playerStartPositionX, ( OCCursor.cursorPosition.y - (this.paddles.height/2) ) );
-        this.drawAIPaddle(this.paddles.AIStartPositionX, ( OCCursor.cursorPosition.y - (this.paddles.height/2) ));
-        this.drawBall(this.paddles.playerStartPositionX - this.ball.width - 1 /* padding */ - (this.frameUpper--*this.timeMultiplier*this.ball.weight), ( OCCursor.cursorPosition.y - (this.ball.height / 2) ));  
+
+        // paddle posititiong player
+        this.paddles.player.actualPosY = ( OCCursor.cursorPosition.y - (this.paddles.height / 2) );
+        this.drawPlayerPaddle(this.paddles.player.startPosX, this.paddles.player.actualPosY);
+
+        // paddle posititiong AI
+        this.paddles.AI.actualPosY = this.paddles.player.actualPosY; 
+        this.drawAIPaddle(this.paddles.AI.startPosX, this.paddles.AI.actualPosY);
+
+        // ball positioning 
+        this.ball.actualPosX = this.paddles.player.startPosX;
+        this.ball.actualPosY = this.paddles.player.actualPosY;
+        this.drawBall(this.ball.actualPosX, this.ball.actualPosY);  
     }
 }
 // Objects assignment of classes

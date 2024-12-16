@@ -106,6 +106,7 @@ class CGameView {
             return true;
         }
     }
+
     playButtonTriggered(Event) {
         if(OCGameView.isPlayButtonTriggered === false) {
             Event.preventDefault();
@@ -123,6 +124,14 @@ class CGameView {
             }
             else {
                 OCGameView.isPlayButtonTriggered = false;
+            }
+        }
+    }
+
+    isGamePaused(Event) {
+        if (gameStatus.isStarted) {
+            if (Event.which === 32 || Event.keyCode === 32 || Event.key === " " || Event.code === "Space") {
+                gameStatus.isPaused = gameStatus.isPaused ? false : true;
             }
         }
     }
@@ -174,16 +183,18 @@ class CGame {
         this.paddles = {
             width: 20,
             height: 100,
-            playerStartPositionX: (domCtx.width - 50 /* padding */ - 20 /* paddle width */), 
+            actualPlayerPositionY: 0,
+            playerStartPositionX: (domCtx.width - 50 /* padding */ - 20 /* paddle width */),
+            actualAIPositionY: 0, 
             AIStartPositionX: (0 /* X-axis (from left) */ + 50 /* padding */),
         };
         this.ball = {
             width: 10,
             height: 10,
             weight: 2.5,
+            actualPositionX: 0,
+            actualPositionY: 0,
         };
-        this.frameLower = 0;
-        this.frameUpper = 60;
         this.timeMultiplier = 1.15;
     }
     drawPlayersNames() {
@@ -222,21 +233,7 @@ class CGame {
         this.drawPlayersNames();
         this.drawPlayerPaddle(this.paddles.playerStartPositionX, ( OCCursor.cursorPosition.y - (this.paddles.height/2) ) );
         this.drawAIPaddle(this.paddles.AIStartPositionX, ( OCCursor.cursorPosition.y - (this.paddles.height/2) ));
-        
-        
-        if(this.frameLower < 60) {
-            this.drawBall(this.paddles.playerStartPositionX - this.ball.width - 1 /* padding */ - (this.frameLower++*this.timeMultiplier*this.ball.weight), ( OCCursor.cursorPosition.y - (this.ball.height / 2) ));
-        }
-        else {
-            this.drawBall(this.paddles.playerStartPositionX - this.ball.width - 1 /* padding */ - (this.frameUpper--*this.timeMultiplier*this.ball.weight), ( OCCursor.cursorPosition.y - (this.ball.height / 2) ));
-            if (this.frameUpper === 0) {
-                this.frameLower = 0;
-                this.frameUpper = 60;
-            }
-        }
-
-        console.log(`${this.frameLower}, ${this.frameUpper}`);
-        
+        this.drawBall(this.paddles.playerStartPositionX - this.ball.width - 1 /* padding */ - (this.frameUpper--*this.timeMultiplier*this.ball.weight), ( OCCursor.cursorPosition.y - (this.ball.height / 2) ));  
     }
 }
 // Objects assignment of classes
@@ -250,8 +247,10 @@ const OCGame = new CGame();
 // APP FUNCTION
 const gameLoop = () => {
     if (gameStatus.isStarted) {
-        ctx.clearRect(0, 0, domCtx.width, domCtx.height);
-        OCGame.drawUI();
+        if(gameStatus.isPaused === false) {
+            ctx.clearRect(0, 0, domCtx.width, domCtx.height);
+            OCGame.drawUI();
+        }
         requestAnimationFrame(gameLoop);
     }
 };
@@ -273,6 +272,7 @@ domElementsStack.modalElementInput.addEventListener("input", OCGameView.renderPl
 /* for older browsers */
 domElementsStack.modalElementInput.addEventListener('propertychange', OCGameView.renderPlayerNamePreview);
 
+window.addEventListener("keydown", OCGameView.isGamePaused);
 window.onload = () => init();
 // /EVENT BINDINGS
 

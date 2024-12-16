@@ -174,9 +174,17 @@ class CGame {
         this.paddles = {
             width: 20,
             height: 100,
-            playerStaticPositionX: (domCtx.width - 50 /* padding */ - 20 /* paddle width */), 
-            AIStaticPositionX: (0 /* X-axis (from left) */ + 50 /* padding */),
-        }
+            playerStartPositionX: (domCtx.width - 50 /* padding */ - 20 /* paddle width */), 
+            AIStartPositionX: (0 /* X-axis (from left) */ + 50 /* padding */),
+        };
+        this.ball = {
+            width: 10,
+            height: 10,
+            weight: 2.5,
+        };
+        this.frameLower = 0;
+        this.frameUpper = 60;
+        this.timeMultiplier = 1.15;
     }
     drawPlayersNames() {
         ctx.fillStyle = `${drawProperties.fontColor}`;
@@ -206,17 +214,30 @@ class CGame {
 
     drawBall(ballX, ballY) {
         ctx.fillStyle = `${drawProperties.fontColor}`;
-        ctx.fillRect(ballX, ballY, 10, 10);
+        ctx.fillRect(ballX, ballY, this.ball.width, this.ball.height);
     }
 
     drawUI() {
         this.drawLineDivider();
         this.drawPlayersNames();
-        this.drawPlayerPaddle(this.paddles.playerStaticPositionX, ( OCCursor.cursorPosition.y - (this.paddles.height/2) ) );
-        this.drawAIPaddle(this.paddles.AIStaticPositionX, ( OCCursor.cursorPosition.y - (this.paddles.height/2) ));
-        this.drawBall();
-    }
+        this.drawPlayerPaddle(this.paddles.playerStartPositionX, ( OCCursor.cursorPosition.y - (this.paddles.height/2) ) );
+        this.drawAIPaddle(this.paddles.AIStartPositionX, ( OCCursor.cursorPosition.y - (this.paddles.height/2) ));
+        
+        
+        if(this.frameLower < 60) {
+            this.drawBall(this.paddles.playerStartPositionX - this.ball.width - 1 /* padding */ - (this.frameLower++*this.timeMultiplier*this.ball.weight), ( OCCursor.cursorPosition.y - (this.ball.height / 2) ));
+        }
+        else {
+            this.drawBall(this.paddles.playerStartPositionX - this.ball.width - 1 /* padding */ - (this.frameUpper--*this.timeMultiplier*this.ball.weight), ( OCCursor.cursorPosition.y - (this.ball.height / 2) ));
+            if (this.frameUpper === 0) {
+                this.frameLower = 0;
+                this.frameUpper = 60;
+            }
+        }
 
+        console.log(`${this.frameLower}, ${this.frameUpper}`);
+        
+    }
 }
 // Objects assignment of classes
 const OCPlayer = new CPlayer();
@@ -229,7 +250,7 @@ const OCGame = new CGame();
 // APP FUNCTION
 const gameLoop = () => {
     if (gameStatus.isStarted) {
-        ctx.clearRect(0, 0, domElementsStack.canvas.width, domElementsStack.canvas.height);
+        ctx.clearRect(0, 0, domCtx.width, domCtx.height);
         OCGame.drawUI();
         requestAnimationFrame(gameLoop);
     }

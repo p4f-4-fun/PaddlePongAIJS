@@ -92,6 +92,9 @@ class CGameView {
             domElementsStack.gameContainer.removeChild(domElementsStack.modalElement);
 
         }, this.setTimeoutDuration);
+
+        // cursor none for UX
+        //domElementsStack.gameContainer.classList.add("cursorNone");
     }
 
 
@@ -189,7 +192,7 @@ class CPlayer {
         return this.#playerLSData.playerScore;
     }
     set playerScore(playerScore) {
-        this.#playerLSData.playerScore = playerScore;
+        this.#playerLSData.playerScore += playerScore;
         localStorage.setItem("playerScore", this.#playerLSData.playerScore);
     }
 }
@@ -261,7 +264,7 @@ class CGame {
     }
 
     drawBall(ballX, ballY) {
-        ctx.fillStyle = `${drawProperties.elementsUIColor}`;
+        ctx.fillStyle = `${drawProperties.elementsUIColorNoticeable}`;
         ctx.fillRect(ballX, ballY, this.ball.width, this.ball.height);
     }
     
@@ -291,9 +294,10 @@ class CGame {
     drawUI() {
         this.drawLineDivider();
         this.drawPlayersNames();
+        OCGameView.renderGameScore();
 
         // paddle posititiong player
-        this.paddles.player.actualPosY = ( OCCursor.cursorPosition.y - (this.paddles.height / 2) );
+        this.paddles.player.actualPosY = OCCursor.cursorPosition.y;
         this.drawPlayerPaddle(this.paddles.player.constPosX, this.paddles.player.actualPosY);
 
         // paddle posititiong AI
@@ -301,8 +305,8 @@ class CGame {
         this.drawAIPaddle(this.paddles.AI.constPosX, this.paddles.AI.actualPosY);
 
         // ball positioning 
-        this.ball.actualPosX = this.paddles.player.constPosX;
-        this.ball.actualPosY = this.paddles.player.actualPosY;
+        this.ball.actualPosX = this.paddles.player.constPosX - this.ball.width - 1; // -1 just for margin gap
+        this.ball.actualPosY = this.paddles.player.actualPosY + this.getCenterOfElement("paddles").player.fromYPos;
         this.drawBall(this.ball.actualPosX, this.ball.actualPosY); 
     }
 }

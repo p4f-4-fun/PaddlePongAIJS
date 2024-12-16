@@ -117,7 +117,7 @@ body {
                     font-size: 2.4rem;
                     font-weight: 900;
                     color: globals.$colorMain;
-                    cursor: pointer !important;
+                    cursor: pointer;
                     
                     &::after {
                         content: "";

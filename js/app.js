@@ -167,6 +167,9 @@ class CCursor {
 
     updateCursorPosition (Event) {
         OCCursor.cursorPosition.y = Event.offsetY;
+        
+        /* console log only in debug mode */
+        console.log(`${Event.offsetX} - ${Event.offsetY}`);
     }
 }
 
@@ -192,7 +195,7 @@ class CPlayer {
         return this.#playerLSData.playerScore;
     }
     set playerScore(playerScore) {
-        this.#playerLSData.playerScore += playerScore;
+        this.#playerLSData.playerScore += parseInt(playerScore);
         localStorage.setItem("playerScore", this.#playerLSData.playerScore);
     }
 }
@@ -272,18 +275,18 @@ class CGame {
         switch(element) {
             case "ball":
                 return {
-                    fromXPos: this.ball.actualPosX - (this.ball.width / 2),
-                    fromYPos: this.ball.actualPosY - (this.ball.height / 2),
+                    fromXPos: this.ball.actualPosX + (this.ball.width / 2),
+                    fromYPos: this.ball.actualPosY + (this.ball.height / 2),
                 };
             case "paddles":
                 return {
                     player: {
-                        fromXPos: this.paddles.player.constPosX - (this.paddles.width / 2),
-                        fromYPos: this.paddles.player.actualPosY - (this.paddles.height / 2),
+                        fromXPos: this.paddles.player.constPosX + (this.paddles.width / 2),
+                        fromYPos: this.paddles.player.actualPosY + (this.paddles.height / 2),
                     },
                     AI: {
-                        fromXPos: this.paddles.AI.constPosX - (this.paddles.width / 2),
-                        fromYPos: this.paddles.AI.actualPosY - (this.paddles.height / 2),
+                        fromXPos: this.paddles.AI.constPosX + (this.paddles.width / 2),
+                        fromYPos: this.paddles.AI.actualPosY + (this.paddles.height / 2),
                     },
                 };
             default:
@@ -294,7 +297,6 @@ class CGame {
     drawUI() {
         this.drawLineDivider();
         this.drawPlayersNames();
-        OCGameView.renderGameScore();
 
         // paddle posititiong player
         this.paddles.player.actualPosY = OCCursor.cursorPosition.y;
@@ -306,7 +308,7 @@ class CGame {
 
         // ball positioning 
         this.ball.actualPosX = this.paddles.player.constPosX - this.ball.width - 1; // -1 just for margin gap
-        this.ball.actualPosY = this.paddles.player.actualPosY + this.getCenterOfElement("paddles").player.fromYPos;
+        this.ball.actualPosY = this.getCenterOfElement("paddles").player.fromYPos - this.ball.height / 2;
         this.drawBall(this.ball.actualPosX, this.ball.actualPosY); 
     }
 }

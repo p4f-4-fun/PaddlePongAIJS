@@ -86,11 +86,14 @@ class CGameView {
         setTimeout(() => {
             domElementsStack.modalElement.classList.add("hidden");
 
+            // unbinding event listeners from dom events
             domElementsStack.modalElementButton.removeEventListener("click", OCGameView.playButtonTriggered);
+            domElementsStack.modalElementInput.removeEventListener("input", OCGameView.renderPlayerNamePreview);
+            domElementsStack.modalElementInput.removeEventListener('propertychange', OCGameView.renderPlayerNamePreview);
+
             domElementsStack.modalElement.innerHTML = "";
             
             domElementsStack.gameContainer.removeChild(domElementsStack.modalElement);
-
         }, this.setTimeoutDuration);
 
         // cursor none for UX
@@ -216,6 +219,7 @@ class CGame {
                 actualPosY: 0,
             },
         };
+        this.startGameBallTriggered = false;
         this.ball = {
             width: 10,
             height: 10,
@@ -294,6 +298,15 @@ class CGame {
         }
     }
 
+    startGameBall(Event) {
+        if(gameStatus.isStarted === true && gameStatus.isPaused === false && OCGame.startGameBallTriggered === false) {
+            OCGame.startGameBallTriggered = true;
+            console.log("Game started!");
+
+            domElementsStack.canvas.removeEventListener("click", OCGame.startGameBall);
+        }
+    }
+
     drawUI() {
         this.drawLineDivider();
         this.drawPlayersNames();
@@ -342,8 +355,9 @@ const init = () => {
 
 // EVENT BINDINGS
 domElementsStack.canvas.addEventListener("mousemove", OCCursor.updateCursorPosition);
-domElementsStack.modalElementButton.addEventListener("click", OCGameView.playButtonTriggered);
+domElementsStack.canvas.addEventListener("click", OCGame.startGameBall);
 
+domElementsStack.modalElementButton.addEventListener("click", OCGameView.playButtonTriggered);
 domElementsStack.modalElementInput.addEventListener("input", OCGameView.renderPlayerNamePreview);
 /* for older browsers */
 domElementsStack.modalElementInput.addEventListener('propertychange', OCGameView.renderPlayerNamePreview);

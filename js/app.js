@@ -20,7 +20,8 @@ let gameStatus = {
     isStarted: false,
 };
 const drawProperties = {
-    fontFamily: "Tahoma, sans-serif",
+    fontFamily: "BarlowRegular",
+    fontFamilyAlert: "BarlowBold",
     
     fontColor: "#FFFFFF",
     fontAlertColor: "#FF0000",
@@ -151,13 +152,21 @@ class CGameView {
 
                 if (gameStatus.isPaused) {
                     ctx.fillStyle = `${drawProperties.fontAlertColor}`;
-                    ctx.font = `${drawProperties.fontWeightAlert} ${drawProperties.fontSizeAlert} ${drawProperties.fontFamily}`;
+                    ctx.font = `${drawProperties.fontWeightAlert} ${drawProperties.fontSizeAlert} ${drawProperties.fontFamilyAlert}`;
             
                     // ai name draw position
                     ctx.fillText("Game is paused - press [SPACE] to play", ((domCtx.width / 2) - 225), ((domCtx.height / 2) - 25));
                 }
             }
         }
+    }
+    
+    loadInGameFonts() {
+        const BarlowFontRegular = new FontFace('BarlowRegular', 'url("assets/fonts/BarlowSemiCondensed-Regular.woff")');
+        BarlowFontRegular.load().then(font => document.fonts.add(font), error => console.error(`Failed to load BarlowRegular-Bold.woff font => ${error.message}`));
+
+        const BarlowFontBold = new FontFace('BarlowBold', 'url("assets/fonts/BarlowSemiCondensed-Bold.woff")'); 
+        BarlowFontBold.load().then(font => document.fonts.add(font), error => console.error(`Failed to load BarlowSemiCondensed-Bold.woff font => ${error.message}`));
     }
 }
 
@@ -244,9 +253,10 @@ class CGame {
             }
         };
     }
+
     drawPlayersNames() {
         ctx.fillStyle = `${drawProperties.elementsUIColor}`;
-        ctx.font = `${drawProperties.fontWeight} ${drawProperties.fontSize} ${drawProperties.fontFamily}`;
+        ctx.font = `${drawProperties.fontWeight} ${drawProperties.fontSize} ${drawProperties.fontFamilyAlert}`;
 
         // player name draw position
         ctx.fillText(`${OCPlayer.playerName}`, this.playerNamesDrawingPosition.playerName.posX, this.playerNamesDrawingPosition.playerName.posY);
@@ -350,6 +360,7 @@ const init = () => {
     OCGameView.renderPlayerNamePreviewOnce();
     OCGameView.renderGameScoreOnce();
     OCGameView.renderPlayerNameInputModal();
+    OCGameView.loadInGameFonts();
 };
 // /INIT FUNCTION
 

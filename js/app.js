@@ -181,7 +181,7 @@ class CCursor {
         OCCursor.cursorPosition.y = Event.offsetY;
         
         /* console log only in debug mode */
-        console.log(`${Event.offsetX} - ${Event.offsetY}`);
+        // console.log(`${Event.offsetX} - ${Event.offsetY}`);
     }
 }
 
@@ -228,19 +228,26 @@ class CGame {
                 actualPosY: 0,
             },
         };
-        this.startGameBallTriggered = false;
+        this.startGameBallTriggered = {
+            isTriggered: false,
+            isDone: false,
+        };
         this.ball = {
             width: 10,
             height: 10,
-            weight: 2.5,
+            weight: 5,
             actualPosX: 0,
             actualPosY: 0,
+
+            firstThrowGameBall: {
+                // 0 for left [DOWN], 1 for right [UP]
+                randomDirection: Math.random() < 0.5 ? 0 : 1,
+            },
         };
         this.lineDivider = {
             width: 4,
             halfWidth: 2,
         };
-        this.velocity = 1.15;
         this.playerNamesDrawingPosition = {
             playerName: {
                 posX: 460,
@@ -308,19 +315,31 @@ class CGame {
         }
     }
 
+    firstThrowGameBall() {
+        if (this.ball.firstThrowGameBall.randomDirection === 0) {
+            this.ball.actualPosX -= this.ball.weight;
+            this.ball.actualPosY -= this.ball.weight;
+            this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
+        } 
+        else {
+            this.ball.actualPosX -= this.ball.weight;
+            this.ball.actualPosY += this.ball.weight;
+            this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
+        }
+
+        // TODO - DETECT FIRST COLLISION WITH BANDRIES, IF COLISSION OCCUR IT MEANS THE FIRST THROW IS DONE AND isDone = true
+        //this.startGameBallTriggered.isDone = true;
+    }
+
     startGameBall(Event) {
-        if(gameStatus.isStarted === true && gameStatus.isPaused === false && OCGame.startGameBallTriggered === false) {
-            OCGame.startGameBallTriggered = true;
-            console.log("Game started!");
+        if(gameStatus.isStarted === true && gameStatus.isPaused === false && OCGame.startGameBallTriggered.isTriggered === false) {
+            OCGame.startGameBallTriggered.isTriggered = true;
 
             domElementsStack.canvas.removeEventListener("click", OCGame.startGameBall);
         }
     }
 
     drawUI() {
-        this.drawLineDivider();
-        this.drawPlayersNames();
-
         // paddle posititiong player
         this.paddles.player.actualPosY = OCCursor.cursorPosition.y;
         this.drawPlayerPaddle(this.paddles.player.constPosX, this.paddles.player.actualPosY);
@@ -330,9 +349,16 @@ class CGame {
         this.drawAIPaddle(this.paddles.AI.constPosX, this.paddles.AI.actualPosY);
 
         // ball positioning 
-        this.ball.actualPosX = this.paddles.player.constPosX - this.ball.width - 1; // -1 just for margin gap
-        this.ball.actualPosY = this.getCenterOfElement("paddles").player.fromYPos - this.ball.height / 2;
-        this.drawBall(this.ball.actualPosX, this.ball.actualPosY); 
+        if (OCGame.startGameBallTriggered.isTriggered === false) {
+            this.ball.actualPosX = this.paddles.player.constPosX - this.ball.width - 1; // -1 just for margin gap
+            this.ball.actualPosY = this.getCenterOfElement("paddles").player.fromYPos - this.ball.height / 2;
+            this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
+        }
+        else {
+            if (OCGame.startGameBallTriggered.isDone === false) {
+                this.firstThrowGameBall();
+            }
+        }
     }
 }
 // Objects assignment of classes

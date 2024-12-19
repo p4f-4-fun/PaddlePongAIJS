@@ -1,5 +1,7 @@
 'use strict';
 
+// may be in the future this will be removed, because of possibility resetting game without page reloading,
+// now only for dev
 localStorage.clear();
 
 // GLOBALS
@@ -13,27 +15,36 @@ const domElementsStack = {
     modalElementInput: dom.querySelector("#game--container__canvasInputModal__input"),
     modalElementButton: dom.querySelector("#game--container__canvasInputModal__button"),
 };
+
 const domCtx = domElementsStack.canvas;
 const ctx = domCtx.getContext("2d");
+
 let gameStatus = {
     isPaused: false,
     isStarted: false,
 };
+
 const drawProperties = {
-    fontFamily: "BarlowRegular",
-    fontFamilyAlert: "BarlowBold",
-    
-    fontColor: "#FFFFFF",
-    fontAlertColor: "#FF0000",
-    
-    fontWeight: "400",
-    fontWeightAlert: "700",
-
-    fontSize: "2.2rem",
-    fontSizeAlert: "2.4rem",
-
-    elementsUIColor: "#FFFFFF",
-    elementsUIColorNoticeable: "#FFFF00",
+    fontRegular: {
+        fontUrl: 'url("assets/fonts/BarlowSemiCondensed-Regular.woff")',
+        fontFamily: "BarlowRegular",
+        fontColor: "#FFFFFF",
+        fontWeight: "400",
+        fontWeightBold: "600",
+        fontSize: "2.2rem",
+    },
+    fontWarrning: {
+        fontUrl: 'url("assets/fonts/BarlowSemiCondensed-Bold.woff")',
+        fontFamily: "BarlowBold",
+        fontColor: "#FFFF00",
+        fontWeight: "800",
+        fontSize: "2.4rem",
+    },
+    UI: {
+        color: "#FFFFFF",
+        colorIfWarnning: "#FFFF00",
+        ballColor: "#FFFF00",
+    },
 };
 // /GLOBALS
 
@@ -43,6 +54,9 @@ class CGameView {
         this.isPlayerNameInputModalOpen = true;
         this.isPlayButtonTriggered = false;
         this.setTimeoutDuration = 200;
+        this.textsInGame = {
+            paused: "Game paused -- press [SPACE] key to continue",
+        };
     }
 
     renderGameScoreOnce() {
@@ -147,26 +161,27 @@ class CGameView {
 
     isGamePaused(Event) {
         if (gameStatus.isStarted) {
+            // [SPACE] key with "32" key number is used to pause/ resume game
             if (Event.which === 32 || Event.keyCode === 32 || Event.key === " " || Event.code === "Space") {
                 gameStatus.isPaused = gameStatus.isPaused ? false : true;
 
                 if (gameStatus.isPaused) {
-                    ctx.fillStyle = `${drawProperties.fontAlertColor}`;
-                    ctx.font = `${drawProperties.fontWeightAlert} ${drawProperties.fontSizeAlert} ${drawProperties.fontFamilyAlert}`;
-            
-                    // ai name draw position
-                    ctx.fillText("Game is paused - press [SPACE] to play", ((domCtx.width / 2) - 225), ((domCtx.height / 2) - 25));
+                    ctx.fillStyle = `${drawProperties.fontWarrning.fontColor}`;
+                    ctx.font = `${drawProperties.fontWarrning.fontWeight} ${drawProperties.fontWarrning.fontSize} ${drawProperties.fontWarrning.fontFamily}`;
+                    
+                    const textPositioningOffset = { x: 225, y: 25, };
+                    ctx.fillText(`${OCGameView.textsInGame.paused}`, ((domCtx.width / 2) - textPositioningOffset.x), ((domCtx.height / 2) - textPositioningOffset.y));
                 }
             }
         }
     }
     
     loadInGameFonts() {
-        const BarlowFontRegular = new FontFace('BarlowRegular', 'url("assets/fonts/BarlowSemiCondensed-Regular.woff")');
-        BarlowFontRegular.load().then(font => document.fonts.add(font), error => console.error(`Failed to load BarlowRegular-Bold.woff font => ${error.message}`));
+        const fontBarlowRegular = new FontFace(`${drawProperties.fontRegular.fontFamily}`, `${drawProperties.fontRegular.fontUrl}`);
+        fontBarlowRegular.load().then(font => dom.fonts.add(font), error => console.error(`Failed to load ${drawProperties.fontRegular.fontFamily} font => ${error.message}`));
 
-        const BarlowFontBold = new FontFace('BarlowBold', 'url("assets/fonts/BarlowSemiCondensed-Bold.woff")'); 
-        BarlowFontBold.load().then(font => document.fonts.add(font), error => console.error(`Failed to load BarlowSemiCondensed-Bold.woff font => ${error.message}`));
+        const fontBarlowBold = new FontFace(`${drawProperties.fontWarrning.fontFamily}`, `${drawProperties.fontWarrning.fontUrl}`); 
+        fontBarlowBold.load().then(font => dom.fonts.add(font), error => console.error(`Failed to load ${drawProperties.fontWarrning.fontFamily} font => ${error.message}`));
     }
 }
 
@@ -180,13 +195,13 @@ class CCursor {
     updateCursorPosition (Event) {
         OCCursor.cursorPosition.y = Event.offsetY;
         
-        /* console log only in debug mode */
+        // console log only in debug mode
         // console.log(`${Event.offsetX} - ${Event.offsetY}`);
     }
 }
 
 class CPlayer {
-    #playerLSData = {};  // Local Storage data for player;
+    #playerLSData = {};  /* Local Storage data for player */
     constructor() {
         this.defaultPlayerName = "Unknown",
         this.#playerLSData = {
@@ -262,8 +277,8 @@ class CGame {
     }
 
     drawPlayersNames() {
-        ctx.fillStyle = `${drawProperties.elementsUIColor}`;
-        ctx.font = `${drawProperties.fontWeight} ${drawProperties.fontSize} ${drawProperties.fontFamilyAlert}`;
+        ctx.fillStyle = `${drawProperties.UI.color}`;
+        ctx.font = `${drawProperties.fontRegular.fontWeightBold} ${drawProperties.fontRegular.fontSize} ${drawProperties.fontRegular.fontFamily}`;
 
         // player name draw position
         ctx.fillText(`${OCPlayer.playerName}`, this.playerNamesDrawingPosition.playerName.posX, this.playerNamesDrawingPosition.playerName.posY);
@@ -273,22 +288,22 @@ class CGame {
     }
 
     drawPlayerPaddle(playerPaddleX, playerPaddleY) {
-        ctx.fillStyle = `${drawProperties.elementsUIColor}`;
+        ctx.fillStyle = `${drawProperties.UI.color}`;
         ctx.fillRect(playerPaddleX, playerPaddleY, this.paddles.width, this.paddles.height);
     }
 
     drawAIPaddle(AIPaddleX, AIPaddleY) {
-        ctx.fillStyle = `${drawProperties.elementsUIColor}`;
+        ctx.fillStyle = `${drawProperties.UI.color}`;
         ctx.fillRect(AIPaddleX, AIPaddleY, this.paddles.width, this.paddles.height);
     }
     
     drawLineDivider() {
-        ctx.fillStyle = `${drawProperties.elementsUIColor}`;
+        ctx.fillStyle = `${drawProperties.UI.color}`;
         ctx.fillRect((domCtx.width / 2 - this.lineDivider.halfWidth), 2, this.lineDivider.width, domCtx.height);
     }
 
     drawBall(ballX, ballY) {
-        ctx.fillStyle = `${drawProperties.elementsUIColorNoticeable}`;
+        ctx.fillStyle = `${drawProperties.UI.ballColor}`;
         ctx.fillRect(ballX, ballY, this.ball.width, this.ball.height);
     }
     
@@ -345,12 +360,13 @@ class CGame {
         this.drawPlayerPaddle(this.paddles.player.constPosX, this.paddles.player.actualPosY);
 
         // paddle posititiong AI
-        this.paddles.AI.actualPosY = this.paddles.player.actualPosY; // <-- this value will be AI generated by tracking ball system fuction 
+        // this value will be AI generated by tracking ball system fuction 
+        this.paddles.AI.actualPosY = this.paddles.player.actualPosY;
         this.drawAIPaddle(this.paddles.AI.constPosX, this.paddles.AI.actualPosY);
 
         // ball positioning 
         if (OCGame.startGameBallTriggered.isTriggered === false) {
-            this.ball.actualPosX = this.paddles.player.constPosX - this.ball.width - 1; // -1 just for margin gap
+            this.ball.actualPosX = this.paddles.player.constPosX - this.ball.width - 1; /* -1 just for margin gap */
             this.ball.actualPosY = this.getCenterOfElement("paddles").player.fromYPos - this.ball.height / 2;
             this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
         }
@@ -361,15 +377,40 @@ class CGame {
         }
     }
 }
-// Objects assignment of classes
+
+//-- Objects assignment of classes
 const OCPlayer = new CPlayer();
 const OCCursor = new CCursor();
 const OCGameView = new CGameView();
 const OCGame = new CGame();
-// /Objects assignment of classes
+//-- /Objects assignment of classes
 // /CLASSES
 
-// APP FUNCTION
+// INIT FUNCTION
+const init = () => {
+    OCGameView.renderPlayerNamePreviewOnce();
+    OCGameView.renderPlayerNameInputModal();
+    
+    OCGameView.renderGameScoreOnce();
+
+    OCGameView.loadInGameFonts();
+
+    //-- EVENT BINDINGS
+    domElementsStack.canvas.addEventListener("mousemove", OCCursor.updateCursorPosition);
+    domElementsStack.canvas.addEventListener("click", OCGame.startGameBall);
+
+    domElementsStack.modalElementButton.addEventListener("click", OCGameView.playButtonTriggered);
+    domElementsStack.modalElementInput.addEventListener("input", OCGameView.renderPlayerNamePreview);
+    //-- for older browsers
+    domElementsStack.modalElementInput.addEventListener('propertychange', OCGameView.renderPlayerNamePreview);
+
+    window.addEventListener("keydown", OCGameView.isGamePaused);
+    //-- /EVENT BINDINGS
+};
+window.onload = () => init();
+// /INIT FUNCTION
+
+// MAIN GAME APP FUNCTION
 const gameLoop = () => {
     if (gameStatus.isStarted) {
         if(gameStatus.isPaused === false) {
@@ -379,28 +420,6 @@ const gameLoop = () => {
         requestAnimationFrame(gameLoop);
     }
 };
-// /APP FUNCTION
-
-// INIT FUNCTION
-const init = () => {
-    OCGameView.renderPlayerNamePreviewOnce();
-    OCGameView.renderGameScoreOnce();
-    OCGameView.renderPlayerNameInputModal();
-    OCGameView.loadInGameFonts();
-};
-// /INIT FUNCTION
-
-// EVENT BINDINGS
-domElementsStack.canvas.addEventListener("mousemove", OCCursor.updateCursorPosition);
-domElementsStack.canvas.addEventListener("click", OCGame.startGameBall);
-
-domElementsStack.modalElementButton.addEventListener("click", OCGameView.playButtonTriggered);
-domElementsStack.modalElementInput.addEventListener("input", OCGameView.renderPlayerNamePreview);
-/* for older browsers */
-domElementsStack.modalElementInput.addEventListener('propertychange', OCGameView.renderPlayerNamePreview);
-
-window.addEventListener("keydown", OCGameView.isGamePaused);
-window.onload = () => init();
-// /EVENT BINDINGS
+// /MAIN GAME APP FUNCTION
 
 

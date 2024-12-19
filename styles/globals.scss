@@ -21,6 +21,11 @@ $colorMain: #FFFFFF;
     border: none;
     border-bottom: calc($borderRadius/2) solid $borderColor;
 }
+@mixin boxShadow($boxShadowSize: 10px) {
+    -webkit-box-shadow: inset 0px 0px $boxShadowSize 0px rgba(0, 0, 0, 1);
+    -moz-box-shadow: inset 0px 0px $boxShadowSize 0px rgba(0, 0, 0, 1);
+    box-shadow: inset 0px 0px $boxShadowSize 0px rgba(0, 0, 0, 1);
+}
 @mixin backgroundColorFromGradientConst($opacity) {
     background-color: rgba(10,10,40,$opacity);
 }

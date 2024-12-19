@@ -33,6 +33,7 @@ body {
         padding: 15px 20px;
         @include globals.borderType1;
         @include globals.d-flex-row;
+        @include globals.boxShadow;
 
         & .header--span {
             display: block;
@@ -79,6 +80,7 @@ body {
 
         & > .game--container {
             @include globals.widthHeight100prcnt;
+            @include globals.boxShadow;
             position: relative;
 
             & > .game--container__canvasInputModal {

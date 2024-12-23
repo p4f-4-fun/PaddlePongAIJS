@@ -41,7 +41,7 @@ const drawProperties = {
         fontWeight: "800",
         fontSize: "2.4rem",
     },
-    
+
     UI: {
         color: "#FFFFFF",
         colorIfWarnning: "#FFFF00",
@@ -270,6 +270,8 @@ class CGame {
             actualPosY: 0,
 
             lastCollision: null,
+
+            firstBallThrown: false,
         };
         this.lineDivider = {
             width: 4,
@@ -296,11 +298,11 @@ class CGame {
             },
 
             left: {
-                xPoint: this.paddles.AI.constPosX + this.paddles.width,
+                xPoint: ( this.getCenterOfElement("paddles").AI.fromXPos + (this.paddles.width / 2) ) - this.ball.width,
             },
 
             right: {
-                xPoint: this.paddles.player.constPosX - this.ball.width,
+                xPoint: ( this.getCenterOfElement("paddles").player.fromXPos - (this.paddles.width / 2) ) + this.ball.width,
             },
         };
     }
@@ -363,8 +365,9 @@ class CGame {
     }
 
     randBallDirection(whoTriggered) {
-        // Player side: 0 = left  [DOWN], 1 = right [UP]
-        // ----AI Side: 0 = right   [UP], 1 = left  [DOWN]
+        // 0 = left, 1 = right
+        // Player side: left = [DOWN], right = [UP]
+        // ----AI side: left =   [UP], right = [DOWN]
         const rand = Math.random() < 0.5 ? 0 : 1;
 
         if (whoTriggered === "playerPaddle") {
@@ -384,6 +387,12 @@ class CGame {
         }
     }
 
+    resetGameRound() {
+        this.lastCollision = null;
+        this.startGameBallTriggered.isTriggered = false;
+        this.ball.firstBallThrown = false;
+    }
+
     detectCollision() {
         // top Wall
         if (this.ball.actualPosY <= this.collisionZones.top.yPoint) {
@@ -394,13 +403,31 @@ class CGame {
         if (this.ball.actualPosY >= this.collisionZones.bottom.yPoint) {
             this.lastCollision = "bottom";
         } 
-        
+
+        // Player Paddle
+        if ( this.ball.actualPosX === (this.getCenterOfElement("paddles").player.fromXPos - (this.paddles.width / 2) - this.ball.width - 1/*-1 = margin gap*/) &&
+            this.ball.actualPosY >= this.paddles.player.actualPosY && 
+            this.ball.actualPosY <= ( (this.paddles.player.actualPosY + this.paddles.player.height) - this.ball.height ) ) 
+        {
+            this.lastCollision = "playerPaddle";
+            console.log(this.lastCollision);
+        }
+
+        // AI Paddle
+        if ( this.ball.actualPosX === (this.getCenterOfElement("paddles").AI.fromXPos + (this.paddles.width / 2) + 1/*-1 = margin gap*/) &&
+            this.ball.actualPosY >= this.paddles.AI.actualPosY && 
+            this.ball.actualPosY <= ( (this.paddles.AI.actualPosY + this.paddles.AI.height) - this.ball.height ) ) 
+        {
+            this.lastCollision = "AIPaddle";
+            console.log(this.lastCollision);
+        }
+
         // left Wall
         if (this.ball.actualPosX <= this.collisionZones.left.xPoint) {
             OCPlayer.playerScore = 1; // player positive point by collision on AI side
             OCGameView.renderGameScore();
 
-            this.startGameBallTriggered.isTriggered = false;
+            this.resetGameRound();
         }
         
         // right Wall
@@ -408,17 +435,7 @@ class CGame {
             OCPlayer.playerScore = (-1); //player negative point by collision on player side
             OCGameView.renderGameScore();
 
-            this.startGameBallTriggered.isTriggered = false;
-        }
-
-        // AI Paddle
-        if (this.ball.actualPosX >= this.collisionZones.right.xPoint) {
-            this.lastCollision = "AIPaddle";
-        }
-
-        // Player Paddle
-        if (this.ball.actualPosX >= this.collisionZones.right.xPoint) {
-            this.lastCollision = "playerPaddle";
+            this.resetGameRound();
         }
 
         this.reboundBall(this.lastCollision);
@@ -444,35 +461,61 @@ class CGame {
             case "top":
                 this.ball.actualPosX -= this.ball.weight;
                 this.ball.actualPosY += this.ball.weight;
+
                 this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
-                console.log( this.ball.actualPosY);
                 break;
 
             case "bottom":
                 this.ball.actualPosX -= this.ball.weight;
                 this.ball.actualPosY -= this.ball.weight;
+
                 this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
                 break;
 
-            // case "playerPaddle":
-            //     this.ball.actualPosX -= this.ball.weight;
-            //     this.ball.actualPosY -= this.ball.weight;
-            //     this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
-            //     break;
-            case "AIPaddle":
-                this.ball.actualPosX += this.ball.weight;
-                (this.ball.ifThrownBall.randDirection === 0) ? this.ball.actualPosY -= this.ball.weight : this.ball.actualPosY += this.ball.weight;
+            case "playerPaddle":
+                this.ball.actualPosX -= this.ball.weight;
+
+                // (this.randBallDirection("playerPaddle").directionDesc === "up") 
+                //     ? this.ball.actualPosY -= this.ball.weight 
+                //     : this.ball.actualPosY += this.ball.weight;
+
+                this.ball.actualPosY -= this.ball.weight
+
                 this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
                 break;
+
+            case "AIPaddle":
+                this.ball.actualPosX += this.ball.weight;
+
+                // (this.randBallDirection("AIPaddle").directionDesc === "up") 
+                //     ? this.ball.actualPosY += this.ball.weight 
+                //     : this.ball.actualPosY -= this.ball.weight;
+
+                this.ball.actualPosY += this.ball.weight
+
+                this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
+                break;
+            default: 
+                this.ball.actualPosX -= 6 + this.ball.weight;
+                this.ball.actualPosY -= this.ball.weight
+                
+                this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
         }
     }
 
     firstThrowGameBall() {
-        this.ball.actualPosX -= ( Math.floor( Math.random() * this.ball.posXAccelUpThr ) + this.ball.posXAccelLowThr ) + this.ball.weight;
-        (this.randBallDirection("playerPaddle").value) ? this.ball.actualPosY -= this.ball.weight : this.ball.actualPosY += this.ball.weight;
-        
-        this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
+        if (this.ball.firstBallThrown === false) {
+            // at least for the V1 of game, the ball will be always thrown from player side
+            this.ball.actualPosX -= ( Math.floor( Math.random() * this.ball.posXAccelUpThr ) + this.ball.posXAccelLowThr ) + this.ball.weight;
+            
+            (this.randBallDirection("playerPaddle").directionDesc === "up") 
+                ? this.ball.actualPosY -= this.ball.weight 
+                : this.ball.actualPosY += this.ball.weight;
+            
+            this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
+        }
 
+        this.ball.firstBallThrown = true;
         this.detectCollision();
     }
 
@@ -485,8 +528,8 @@ class CGame {
         }
     }
 
-    computeAIPaddlePosYByBallTracking() {
-        return this.ball.actualPosY - (this.paddles.height / 2) + (this.ball.height / 2);
+    computeAIPaddlePosYViaBallPosYTracking() {
+        return this.ball.actualPosY - ((this.paddles.height / 2) + (this.ball.height / 2));
     }
 
     drawUI() {
@@ -495,7 +538,7 @@ class CGame {
         this.drawPlayerPaddle(this.paddles.player.constPosX, this.paddles.player.actualPosY);
 
         // paddle posititiong 
-        this.paddles.AI.actualPosY = this.paddles.AI.actualPosY !== this.paddles.player.actualPosY ? this.computeAIPaddlePosYByBallTracking() : this.paddles.player.actualPosY;
+        this.paddles.AI.actualPosY = this.computeAIPaddlePosYViaBallPosYTracking();
         this.drawAIPaddle(this.paddles.AI.constPosX, this.paddles.AI.actualPosY);
 
         // ball positioning 

@@ -116,7 +116,7 @@ class CGameView {
         }, this.setTimeoutDuration);
 
         // cursor none for UX
-        //domElementsStack.gameContainer.classList.add("cursorNone");
+        domElementsStack.gameContainer.classList.add("cursorNone");
     }
 
 
@@ -168,7 +168,8 @@ class CGameView {
         }
     }
 
-    isGamePaused(Event) {
+    gameViewReactionOnKeyDown(Event) {
+        // PAUSE OR RESUME GAME REACTION
         if (gameStatus.isStarted) {
             // [SPACE] key with "32" key number is used to pause/ resume game
             if (Event.which === 32 || Event.keyCode === 32 || Event.key === " " || Event.code === "Space") {
@@ -183,6 +184,7 @@ class CGameView {
                 }
             }
         }
+        // /PAUSE OR RESUME GAME REACTION
     }
     
     loadInGameFonts() {
@@ -250,13 +252,13 @@ class CGame {
             AI: {
                 constPosX: (0 /* X-axis (from left) */ + 50 /* margin gap */),
                 actualPosY: 0,
-                initialRandomPosY: Math.floor( Math.random() * (domCtx.height - 100 /* <-- paddle height */)),
             },
         };
+
         this.startGameBallTriggered = {
             isTriggered: false,
-            isDone: false,
         };
+
         this.ball = {
             width: 10,
             height: 10,
@@ -265,6 +267,7 @@ class CGame {
             
             posXAccelUpThr: 7,
             posXAccelLowThr: 1,
+            defaultBallPosXAcceleration: 1,
 
             actualPosX: 0,
             actualPosY: 0,
@@ -273,10 +276,11 @@ class CGame {
 
             firstBallThrown: false,
         };
+
         this.lineDivider = {
             width: 4,
-            halfWidth: 2,
         };
+
         this.playerNamesDrawingPosition = {
             playerName: {
                 posX: 460,
@@ -288,6 +292,7 @@ class CGame {
                 posY: 25,
             }
         };
+
         this.collisionZones = {
             top: {
                 yPoint: 1 /* NOT 0, because of design margin gap 1px in canvas box */,
@@ -330,7 +335,7 @@ class CGame {
     
     drawLineDivider() {
         ctx.fillStyle = `${drawProperties.UI.color}`;
-        ctx.fillRect((domCtx.width / 2 - this.lineDivider.halfWidth), 2, this.lineDivider.width, domCtx.height);
+        ctx.fillRect( ( (domCtx.width / 2) - (this.lineDivider.width / 2) ), 2, this.lineDivider.width, domCtx.height);
     }
 
     drawBall(ballX, ballY) {
@@ -394,29 +399,39 @@ class CGame {
     }
 
     detectCollision() {
-        // top Wall
-        if (this.ball.actualPosY <= this.collisionZones.top.yPoint) {
-            this.lastCollision = "top";
+        // top Wall from Player Side
+        if (this.ball.actualPosY <= this.collisionZones.top.yPoint && this.lastCollision === "topFromAISide") {
+            this.lastCollision = "topFromPlayerSide";
+        }
+
+        // top Wall from AI Side
+        if (this.ball.actualPosY <= this.collisionZones.top.yPoint && this.lastCollision === "topFromPlayerSide") {
+            this.lastCollision = "topFromAISide";
         }
         
         // bottom Wall
-        if (this.ball.actualPosY >= this.collisionZones.bottom.yPoint) {
-            this.lastCollision = "bottom";
+        if (this.ball.actualPosY >= this.collisionZones.bottom.yPoint && this.lastCollision === "bottomFromAISide") {
+            this.lastCollision = "bottomFromPlayerSide";
+        }
+        
+        // bottom Wall
+        if (this.ball.actualPosY >= this.collisionZones.bottom.yPoint && this.lastCollision === "bottomFromPlayerSide") {
+            this.lastCollision = "bottomFromAISide";
         } 
 
         // Player Paddle
         if ( this.ball.actualPosX === (this.getCenterOfElement("paddles").player.fromXPos - (this.paddles.width / 2) - this.ball.width - 1/*-1 = margin gap*/) &&
             this.ball.actualPosY >= this.paddles.player.actualPosY && 
-            this.ball.actualPosY <= ( (this.paddles.player.actualPosY + this.paddles.player.height) - this.ball.height ) ) 
+            this.ball.actualPosY <= ( (this.paddles.player.actualPosY + this.paddles.height) - this.ball.height ) ) 
         {
             this.lastCollision = "playerPaddle";
             console.log(this.lastCollision);
         }
 
         // AI Paddle
-        if ( this.ball.actualPosX === (this.getCenterOfElement("paddles").AI.fromXPos + (this.paddles.width / 2) + 1/*-1 = margin gap*/) &&
+        if ( this.ball.actualPosX <= (this.getCenterOfElement("paddles").AI.fromXPos + (this.paddles.width / 2) + 1/*-1 = margin gap*/) &&
             this.ball.actualPosY >= this.paddles.AI.actualPosY && 
-            this.ball.actualPosY <= ( (this.paddles.AI.actualPosY + this.paddles.AI.height) - this.ball.height ) ) 
+            this.ball.actualPosY <= ( (this.paddles.AI.actualPosY + this.paddles.height) - this.ball.height ) ) 
         {
             this.lastCollision = "AIPaddle";
             console.log(this.lastCollision);
@@ -429,16 +444,18 @@ class CGame {
 
             this.resetGameRound();
         }
-        
+
         // right Wall
-        if (this.ball.actualPosX >= this.collisionZones.right.xPoint) {
+        else if (this.ball.actualPosX >= this.collisionZones.right.xPoint) {
             OCPlayer.playerScore = (-1); //player negative point by collision on player side
             OCGameView.renderGameScore();
 
             this.resetGameRound();
         }
 
-        this.reboundBall(this.lastCollision);
+        else {
+            this.reboundBall(this.lastCollision);
+        }
     }
 
     reboundBall(collisionZone) {
@@ -458,47 +475,52 @@ class CGame {
          */
 
         switch (collisionZone) {
-            case "top":
-                this.ball.actualPosX -= this.ball.weight;
+            case "topFromPlayerSide":
+                this.ball.actualPosX -= ( Math.floor( Math.random() * this.ball.posXAccelUpThr ) + this.ball.posXAccelLowThr ) + this.ball.weight;
                 this.ball.actualPosY += this.ball.weight;
 
                 this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
                 break;
 
-            case "bottom":
-                this.ball.actualPosX -= this.ball.weight;
+            case "bottomFromPlayerSide":
+                this.ball.actualPosX -= ( Math.floor( Math.random() * this.ball.posXAccelUpThr ) + this.ball.posXAccelLowThr ) + this.ball.weight;
                 this.ball.actualPosY -= this.ball.weight;
 
                 this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
                 break;
 
+            case "topFromAISide":
+                this.ball.actualPosX += ( Math.floor( Math.random() * this.ball.posXAccelUpThr ) + this.ball.posXAccelLowThr ) + this.ball.weight;
+                this.ball.actualPosY += this.ball.weight;
+
+                this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
+                break;
+
+            case "bottomFromAISide":
+                this.ball.actualPosX += ( Math.floor( Math.random() * this.ball.posXAccelUpThr ) + this.ball.posXAccelLowThr ) + this.ball.weight;
+                this.ball.actualPosY -= this.ball.weight;
+
+                this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
+                break;                
+
             case "playerPaddle":
-                this.ball.actualPosX -= this.ball.weight;
-
-                // (this.randBallDirection("playerPaddle").directionDesc === "up") 
-                //     ? this.ball.actualPosY -= this.ball.weight 
-                //     : this.ball.actualPosY += this.ball.weight;
-
+                this.ball.actualPosX -= ( Math.floor( Math.random() * this.ball.posXAccelUpThr ) + this.ball.posXAccelLowThr ) + this.ball.weight;
                 this.ball.actualPosY -= this.ball.weight
 
                 this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
                 break;
 
             case "AIPaddle":
-                this.ball.actualPosX += this.ball.weight;
-
-                // (this.randBallDirection("AIPaddle").directionDesc === "up") 
-                //     ? this.ball.actualPosY += this.ball.weight 
-                //     : this.ball.actualPosY -= this.ball.weight;
-
+                this.ball.actualPosX += ( Math.floor( Math.random() * this.ball.posXAccelUpThr ) + this.ball.posXAccelLowThr ) + this.ball.weight;
                 this.ball.actualPosY += this.ball.weight
 
                 this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
                 break;
+
             default: 
-                this.ball.actualPosX -= 6 + this.ball.weight;
+                this.ball.actualPosX -= this.ball.defaultBallPosXAcceleration + this.ball.weight;
                 this.ball.actualPosY -= this.ball.weight
-                
+
                 this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
         }
     }
@@ -572,6 +594,8 @@ const init = () => {
 
     OCGameView.loadInGameFonts();
 
+    OCGame.ball.defaultBallPosXAcceleration = Math.floor( Math.random() * OCGame.ball.posXAccelUpThr ) + OCGame.ball.posXAccelLowThr;
+
     //-- EVENT BINDINGS
     domElementsStack.canvas.addEventListener("mousemove", OCCursor.updateCursorPosition);
     domElementsStack.canvas.addEventListener("click", OCGame.startGameBall);
@@ -581,7 +605,7 @@ const init = () => {
     //-- for older browsers
     domElementsStack.modalElementInput.addEventListener('propertychange', OCGameView.renderPlayerNamePreview);
 
-    window.addEventListener("keydown", OCGameView.isGamePaused);
+    window.addEventListener("keydown", OCGameView.gameViewReactionOnKeyDown);
     //-- /EVENT BINDINGS
 };
 window.onload = () => init();

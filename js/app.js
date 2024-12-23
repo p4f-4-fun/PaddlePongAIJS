@@ -1,10 +1,17 @@
 'use strict';
 
-// may be in the future this will be removed, because of possibility resetting game without page reloading,
-// now only for dev
-localStorage.clear();
+
 
 // GLOBALS
+const isDEVMode = true;
+
+if (isDEVMode) {
+    localStorage.clear();
+    console.log(`DEV mode: ${isDEVMode}`);
+}
+
+
+
 const dom = document;
 const domElementsStack = {
     canvas: dom.querySelector("#game--container__canvas"),
@@ -49,6 +56,8 @@ const drawProperties = {
     },
 };
 // /GLOBALS
+
+
 
 // CLASSES
 class CGameView {
@@ -116,10 +125,11 @@ class CGameView {
         }, this.setTimeoutDuration);
 
         // cursor none for UX
-        domElementsStack.gameContainer.classList.add("cursorNone");
+        if (isDEVMode === false) {
+            domElementsStack.gameContainer.classList.add("cursorNone");
+        }
     }
-
-
+    
     prepareGameBoard() {
         this.removeViewPlayerNameInputModal();
         
@@ -196,20 +206,25 @@ class CGameView {
     }
 }
 
+
+
 class CCursor {
     constructor() {
         this.cursorPosition = {
             y: 0,
-        }
+        };
     }
 
     updateCursorPosition (Event) {
-        OCCursor.cursorPosition.y = Event.offsetY;
-        
-        // console log only in debug mode
-        console.log(`${Event.offsetY}`);
+        OCCursor.cursorPosition.y = Event.clientY - domCtx.getBoundingClientRect().top;
+        // console log only in dev mode
+        if (isDEVMode) {
+            console.log(`[${ parseInt(Event.clientX - domCtx.getBoundingClientRect().left) }, ${ parseInt(Event.clientY - domCtx.getBoundingClientRect().top) }]`);
+        }
     }
 }
+
+
 
 class CPlayer {
     #playerLSData = {};  /* Local Storage data for player */
@@ -237,6 +252,8 @@ class CPlayer {
         localStorage.setItem("playerScore", this.#playerLSData.playerScore);
     }
 }
+
+
 
 class CGame {
     constructor() {
@@ -267,7 +284,6 @@ class CGame {
             
             posXAccelUpThr: 7,
             posXAccelLowThr: 1,
-            defaultBallPosXAcceleration: 1,
 
             actualPosX: 0,
             actualPosY: 0,
@@ -291,7 +307,7 @@ class CGame {
             AIName: {
                 posX: 414,
                 posY: 25,
-            }
+            },
         };
 
         this.collisionZones = {
@@ -313,16 +329,16 @@ class CGame {
         };
     }
 
-    drawPlayersNames() {
-        ctx.fillStyle = `${drawProperties.UI.color}`;
-        ctx.font = `${drawProperties.fontRegular.fontWeightBold} ${drawProperties.fontRegular.fontSize} ${drawProperties.fontRegular.fontFamily}`;
+    // drawPlayersNames() {
+    //     ctx.fillStyle = `${drawProperties.UI.color}`;
+    //     ctx.font = `${drawProperties.fontRegular.fontWeightBold} ${drawProperties.fontRegular.fontSize} ${drawProperties.fontRegular.fontFamily}`;
 
-        // player name draw position
-        ctx.fillText(`${OCPlayer.playerName}`, this.playerNamesDrawingPosition.playerName.posX, this.playerNamesDrawingPosition.playerName.posY);
+    //     // player name draw position
+    //     ctx.fillText(`${OCPlayer.playerName}`, this.playerNamesDrawingPosition.playerName.posX, this.playerNamesDrawingPosition.playerName.posY);
 
-        // ai name draw position
-        ctx.fillText("AI", this.playerNamesDrawingPosition.AIName.posX, this.playerNamesDrawingPosition.AIName.posY);
-    }
+    //     // ai name draw position
+    //     ctx.fillText("AI", this.playerNamesDrawingPosition.AIName.posX, this.playerNamesDrawingPosition.AIName.posY);
+    // }
 
     drawPlayerPaddle(playerPaddleX, playerPaddleY) {
         ctx.fillStyle = `${drawProperties.UI.color}`;
@@ -434,7 +450,7 @@ class CGame {
         }
 
         // AI Paddle
-        else if ( this.ball.actualPosX <= (this.getCenterOfElement("paddles").AI.fromXPos + (this.paddles.width / 2) + 1/*-1 = margin gap*/) &&
+        else if ( this.ball.actualPosX <= (this.getCenterOfElement("paddles").AI.fromXPos + (this.paddles.width / 2) + 1/*1 = margin gap*/) &&
             this.ball.actualPosY >= this.paddles.AI.actualPosY && 
             this.ball.actualPosY <= ( (this.paddles.AI.actualPosY + this.paddles.height) - this.ball.height ) ) 
         {
@@ -483,51 +499,39 @@ class CGame {
             case "topFromPlayerSide":
                 this.ball.actualPosX -= ( Math.floor( Math.random() * this.ball.posXAccelUpThr ) + this.ball.posXAccelLowThr ) + this.ball.weight;
                 this.ball.actualPosY += this.ball.weight;
-
-                this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
                 break;
 
             case "bottomFromPlayerSide":
                 this.ball.actualPosX -= ( Math.floor( Math.random() * this.ball.posXAccelUpThr ) + this.ball.posXAccelLowThr ) + this.ball.weight;
                 this.ball.actualPosY -= this.ball.weight;
-
-                this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
                 break;
 
             case "topFromAISide":
                 this.ball.actualPosX += ( Math.floor( Math.random() * this.ball.posXAccelUpThr ) + this.ball.posXAccelLowThr ) + this.ball.weight;
                 this.ball.actualPosY += this.ball.weight;
-
-                this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
                 break;
 
             case "bottomFromAISide":
                 this.ball.actualPosX += ( Math.floor( Math.random() * this.ball.posXAccelUpThr ) + this.ball.posXAccelLowThr ) + this.ball.weight;
                 this.ball.actualPosY -= this.ball.weight;
-
-                this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
                 break;                
 
             case "playerPaddle":
                 this.ball.actualPosX -= ( Math.floor( Math.random() * this.ball.posXAccelUpThr ) + this.ball.posXAccelLowThr ) + this.ball.weight;
                 this.ball.actualPosY -= this.ball.weight;
-
-                this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
                 break;
 
             case "AIPaddle":
                 this.ball.actualPosX += ( Math.floor( Math.random() * this.ball.posXAccelUpThr ) + this.ball.posXAccelLowThr ) + this.ball.weight;
                 this.ball.actualPosY += this.ball.weight;
-
-                this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
                 break;
 
             default: 
-                this.ball.actualPosX -= this.ball.defaultBallPosXAcceleration + this.ball.weight;
+                this.ball.actualPosX -= ( Math.floor( Math.random() * this.ball.posXAccelUpThr ) + this.ball.posXAccelLowThr ) + this.ball.weight;
                 this.ball.actualPosY -= this.ball.weight;
-
-                this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
         }
+
+        this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
     }
 
     throwBall() {
@@ -542,6 +546,7 @@ class CGame {
             this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
 
             this.ball.lastThrowFrom = "playerPaddle";
+
             this.ball.firstBallThrown = true;
         }
 
@@ -558,26 +563,29 @@ class CGame {
     }
 
     computeAIPaddlePosYViaBallPosYTracking() {
-        return this.ball.actualPosY - ((this.paddles.height / 2) + (this.ball.height / 2));
+        return this.ball.actualPosY - ((this.paddles.height / 2) - (this.ball.height / 2));
     }
 
-    isPaddleBoundaryCollision(posY) {
-        return (posY <= this.collisionZones.top.yPoint || posY >= (this.collisionZones.bottom.yPoint - this.paddles.height)) ? this.paddles.AI.actualPosY : posY;
+    isPaddleBoundaryCollision(posYwhenInvoke, whosInvoke) {
+        const actualPosY = (whosInvoke === "player") ? this.paddles.player.actualPosY : this.paddles.AI.actualPosY;
+        
+        return ( 
+            posYwhenInvoke <= this.collisionZones.top.yPoint || 
+            posYwhenInvoke >= (this.collisionZones.bottom.yPoint - this.paddles.height + this.ball.height) 
+        )   ? actualPosY 
+            : posYwhenInvoke;
     }
 
     drawUI() {
-        // player and ai names
-        this.drawPlayersNames();
-
         // line game sides divder
         this.drawLineDivider();
 
         // paddle posititiong player
-        this.paddles.player.actualPosY = this.isPaddleBoundaryCollision( OCCursor.cursorPosition.y );
+        this.paddles.player.actualPosY = this.isPaddleBoundaryCollision( OCCursor.cursorPosition.y, "player" );
         this.drawPlayerPaddle(this.paddles.player.constPosX, this.paddles.player.actualPosY);
 
         // paddle posititiong 
-        this.paddles.AI.actualPosY = this.isPaddleBoundaryCollision( this.computeAIPaddlePosYViaBallPosYTracking() );
+        this.paddles.AI.actualPosY = this.isPaddleBoundaryCollision( this.computeAIPaddlePosYViaBallPosYTracking(), "AI" );
         this.drawAIPaddle(this.paddles.AI.constPosX, this.paddles.AI.actualPosY);
 
         // ball positioning 
@@ -594,6 +602,8 @@ class CGame {
     }
 }
 
+
+
 //-- Objects assignment of classes
 const OCPlayer = new CPlayer();
 const OCCursor = new CCursor();
@@ -601,6 +611,8 @@ const OCGameView = new CGameView();
 const OCGame = new CGame();
 //-- /Objects assignment of classes
 // /CLASSES
+
+
 
 // INIT FUNCTION
 const init = () => {
@@ -610,24 +622,31 @@ const init = () => {
     OCGameView.renderGameScoreOnce();
 
     OCGameView.loadInGameFonts();
-
-    OCGame.ball.defaultBallPosXAcceleration = Math.floor( Math.random() * OCGame.ball.posXAccelUpThr ) + OCGame.ball.posXAccelLowThr;
+    
+    // check if localStorage is available and not Empty, if so, we will load game with last player name and his score
+    if (localStorage.length > 0 && isDEVMode === false) {
+        gameStatus.isStarted = true;
+        gameLoop();
+    }
 
     //-- EVENT BINDINGS
-    domElementsStack.canvas.addEventListener("mousemove", OCCursor.updateCursorPosition);
     domElementsStack.canvas.addEventListener("click", OCGame.startGameBall);
-
-    domElementsStack.modalElementButton.addEventListener("click", OCGameView.playButtonTriggered);
-
-    domElementsStack.modalElementInput.addEventListener("input", OCGameView.renderPlayerNamePreview);
-    //-- for older browsers
+    
+    //-- onpropertychange event <-- older browsers
     domElementsStack.modalElementInput.addEventListener('propertychange', OCGameView.renderPlayerNamePreview);
-
+    //-- input event <-- modern browsers
+    domElementsStack.modalElementInput.addEventListener("input", OCGameView.renderPlayerNamePreview);
+    domElementsStack.modalElementButton.addEventListener("click", OCGameView.playButtonTriggered);
+    
+    window.addEventListener("mousemove", OCCursor.updateCursorPosition);
     window.addEventListener("keydown", OCGameView.gameViewReactionOnKeyDown);
     //-- /EVENT BINDINGS
 };
+
 window.onload = () => init();
 // /INIT FUNCTION
+
+
 
 // MAIN GAME APP FUNCTION
 const gameLoop = () => {

@@ -131,6 +131,22 @@ body {
   box-shadow: inset 0px 0px 10px 0px rgb(0, 0, 0);
   position: relative;
 }
+.container .game > .game--container > #game--container__gameBoardLineDiv {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  width: 100%;
+  min-width: 100%;
+  height: 100%;
+  min-height: 100%;
+  background-image: -moz-radial-gradient(#FFFFFF 2px, transparent 0);
+  background-image: -webkit-radial-gradient(#FFFFFF 2px, transparent 0);
+  background-image: radial-gradient(#FFFFFF 2px, transparent 0);
+  background-size: 10px 10px;
+  background-repeat: repeat-y;
+  background-position: 50%;
+}
 .container .game > .game--container > .game--container__canvasInputModal {
   display: flex;
   flex-direction: column;

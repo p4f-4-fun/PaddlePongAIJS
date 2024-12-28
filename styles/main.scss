@@ -83,6 +83,20 @@ body {
             @include globals.boxShadow;
             position: relative;
 
+            & > #game--container__gameBoardLineDiv {
+                position: absolute;
+                left: 0;
+                top: 0;
+                z-index: -1;
+                @include globals.widthHeight100prcnt;
+                background-image: -moz-radial-gradient(globals.$backgroundColorFromColorMain 2px, transparent 0);
+                background-image: -webkit-radial-gradient(globals.$backgroundColorFromColorMain 2px, transparent 0);
+                background-image: radial-gradient(globals.$backgroundColorFromColorMain 2px, transparent 0);
+                background-size: 10px 10px;
+                background-repeat: repeat-y;
+                background-position: 50%;
+            }
+            
             & > .game--container__canvasInputModal {
                 @include globals.d-flex-column;
                 row-gap: 40px;

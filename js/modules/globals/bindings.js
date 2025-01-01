@@ -12,8 +12,11 @@ import { domElementsStack, OCCursor, OCGameView, OCGame } from './globals.js';
  * 
  */
 const pageEventsBinding = () => {
-   domElementsStack.canvas.addEventListener("click", OCGame.startGameBall);
-   domElementsStack.canvas.addEventListener("mousemove", OCCursor.updateCursorPosition);
+   const startGameBallEventBindHandler = () => OCGame.startGameBall.bind(OCGame.startGameBall());
+   domElementsStack.canvas.addEventListener("click", startGameBallEventBindHandler);
+
+   const updateCursorPositionEventBindHandler = (Event) => OCCursor.updateCursorPosition.bind(OCCursor.updateCursorPosition(Event));
+   domElementsStack.canvas.addEventListener("mousemove", Event => updateCursorPositionEventBindHandler(Event));
    
    //-- onpropertychange event <-- older browsers
    domElementsStack.modalElementInput.addEventListener('propertychange', OCGameView.renderPlayerNamePreview);
@@ -21,7 +24,6 @@ const pageEventsBinding = () => {
    domElementsStack.modalElementInput.addEventListener("input", OCGameView.renderPlayerNamePreview);
    domElementsStack.modalElementButton.addEventListener("click", OCGameView.playButtonTriggered);
    
-   //window.addEventListener("mousemove", OCCursor.updateCursorPosition);
    window.addEventListener("keydown", OCGameView.gameViewReactionOnKeyDown);
 };
 

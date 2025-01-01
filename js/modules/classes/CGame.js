@@ -43,7 +43,9 @@ class CGame {
             actualPosY: 0,
 
             detectedCollision: "none",
+
             lastThrowFrom: null,
+            previousThrowFrom: null,
 
             firstBallThrown: false,
 
@@ -181,6 +183,7 @@ class CGame {
         this.startPongTrigger = false;
         this.ball.firstBallThrown = false;
         this.ball.lastThrowFrom = null;
+        this.ball.previousThrowFrom = null;
         this.ball.detectedCollision = "none";
     }
 
@@ -210,6 +213,7 @@ class CGame {
             this.ball.actualPosY >= this.paddles.player.actualPosY && 
             this.ball.actualPosY <= ( (this.paddles.player.actualPosY + this.paddles.height) - this.ball.height ) ) 
         {
+            this.ball.previousThrowFrom = this.ball.lastThrowFrom;
             this.ball.lastThrowFrom = "playerPaddle";
             this.ball.detectedCollision = "playerPaddle";
         }
@@ -219,6 +223,7 @@ class CGame {
             this.ball.actualPosY >= this.paddles.AI.actualPosY && 
             this.ball.actualPosY <= ( (this.paddles.AI.actualPosY + this.paddles.height) - this.ball.height ) ) 
         {
+            this.ball.previousThrowFrom = this.ball.lastThrowFrom;
             this.ball.lastThrowFrom = "AIPaddle";
             this.ball.detectedCollision = "AIPaddle";
         }
@@ -239,10 +244,7 @@ class CGame {
             this.resetGameRound();
         }
 
-        // no collision detected
-        else {
-            this.ball.detectedCollision = "none";
-        }
+ 
         
         // if we catch a last collision we should actually rebound the that ball to next position so
         this.reboundBall(this.ball.detectedCollision);
@@ -265,9 +267,8 @@ class CGame {
          */
         
 
-        if (collisionZone !== "none" && this.ball.lastSpeedX !== this.ball.addSpeedX) {
+        if (collisionZone !== "none") {
             this.ball.addSpeedX = this.getRandomBallSpeedFactor();
-            this.ball.lastSpeedX = this.ball.addSpeedX;
         }
 
         switch (collisionZone) {
@@ -293,39 +294,34 @@ class CGame {
 
             case "playerPaddle":
                 this.ball.actualPosX -= this.ball.addSpeedX + this.ball.weight;
-                this.ball.actualPosY -= this.ball.weight;
+
+                this.ball.randDir = this.getRandomBallDirection("playerPaddle").directionDesc;
+                (this.ball.randDir === "up") ? this.ball.actualPosY -= this.ball.weight : this.ball.actualPosY += this.ball.weight;
                 break;
 
             case "AIPaddle":
                 this.ball.actualPosX += this.ball.addSpeedX + this.ball.weight;
-                this.ball.actualPosY += this.ball.weight;
+
+                this.ball.randDir = this.getRandomBallDirection("AIPaddle").directionDesc;
+                (this.ball.randDir === "up") ? this.ball.actualPosY += this.ball.weight : this.ball.actualPosY -= this.ball.weight;
                 break;
             
             case "none":
-                if (this.ball.lastThrowFrom === "playerPaddle") {
-                    this.ball.actualPosX -= this.ball.addSpeedX + this.ball.weight;
-                    
-                    if (this.ball.lastRandDir !== this.ball.randDir) {
-                        this.ball.randDir = this.getRandomBallDirection("playerPaddle").directionDesc;
-                        this.ball.lastRandDir = this.ball.randDir;
-                    }
-                    
-                    (this.ball.randDir === "up") ? this.ball.actualPosY -= this.ball.weight : this.ball.actualPosY += this.ball.weight;
-                }
+                (this.ball.lastThrowFrom === "playerPaddle") 
+                    ? this.ball.actualPosX -= this.ball.addSpeedX + this.ball.weight
+                    : this.ball.actualPosX += this.ball.addSpeedX + this.ball.weight;
 
-                else if (this.ball.lastThrowFrom === "AIPaddle") {                    
-                    this.ball.actualPosX += this.ball.addSpeedX + this.ball.weight;
-                    
-                    if (this.ball.lastRandDir !== this.ball.randDir) {
-                        this.ball.randDir = this.getRandomBallDirection("AIPaddle").directionDesc;
-                        this.ball.lastRandDir = this.ball.randDir;
-                    }
-                    
-                    (this.ball.randDir === "up") ? this.ball.actualPosY += this.ball.weight : this.ball.actualPosY -= this.ball.weight;
-                }
+                (this.ball.lastThrowFrom === "playerPaddle") 
+                    ? (this.ball.randDir === "up") 
+                        ? this.ball.actualPosY += this.ball.weight 
+                        : this.ball.actualPosY -= this.ball.weight
+                    : (this.ball.randDir === "up") 
+                        ? this.ball.actualPosY -= this.ball.weight 
+                        : this.ball.actualPosY += this.ball.weight;
 
                 break;
         }
+        console.log(collisionZone);
 
         this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
     }

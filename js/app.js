@@ -53,8 +53,8 @@ const gameLoop = () => {
             OCGame.drawUI();
         }
         
-        //setTimeout(gameLoop, (1000/* 3150ms/ 1sec *// 65/*frames per seconds*/));
-        requestAnimationFrame(gameLoop);
+        setTimeout(gameLoop, (1000/* 3150ms/ 1sec *// 65/*frames per seconds*/));
+        //requestAnimationFrame(gameLoop);
     }
 };
 // /MAIN GAME APP FUNCTION

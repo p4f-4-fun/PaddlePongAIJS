@@ -77,9 +77,11 @@ class CGameView {
         }, this.setTimeoutDuration);
 
         // cursor none for UX
-        if (isDEVMode === false) {
-            domElementsStack.gameContainer.classList.add("cursorNone");
-        }
+        // if (isDEVMode === false) {
+        //     domElementsStack.gameContainer.classList.add("cursorNone");
+        // }
+
+        domElementsStack.gameContainer.classList.add("cursorNone");
     }
     
     prepareGameBoard() {

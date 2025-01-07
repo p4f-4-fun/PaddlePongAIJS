@@ -2,7 +2,7 @@
  * @import
  * 
  */
-import { isDEVMode, OCCursor } from "./../globals/globals.js";
+import { isDEVMode } from "./../globals/globals.js";
 
 
 
@@ -23,10 +23,10 @@ class CCursor {
         this.cursorPosition.y = Event.offsetY;
         
         // console log only in dev mode
-        if (isDEVMode) {
-            // if domCtx event
-            //console.log(`[${ parseInt(Event.OffsetX) }, ${ parseInt(Event.offsetY) }]`);
-        }
+        // if (isDEVMode) {
+        //     // if domCtx event
+        //     console.log(`[${ parseInt(Event.OffsetX) }, ${ parseInt(Event.offsetY) }]`);
+        // }
     }
 }
 

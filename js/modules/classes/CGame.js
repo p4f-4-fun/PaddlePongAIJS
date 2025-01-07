@@ -2,7 +2,7 @@
  * @import
  * 
  */
-import { domCtx, ctx, gameStatus, drawProperties, OCPlayer, OCCursor, OCGameView, OCGame } from "./../globals/globals.js";
+import { domCtx, ctx, gameStatus, drawProperties, OCPlayer, OCCursor, OCGameView } from "./../globals/globals.js";
 
 
 
@@ -42,18 +42,17 @@ class CGame {
             actualPosX: 0,
             actualPosY: 0,
 
-            detectedCollision: "none",
+            detectedCollision: null,
+
+            previousCollision: null,
 
             lastThrowFrom: null,
-            previousThrowFrom: null,
 
             firstBallThrown: false,
 
             addSpeedX: 1,
-            lastSpeedX: 1,
 
             randDir: "up",
-            lastRandDir: null,
         };
 
         // this.lineDivider = {
@@ -72,6 +71,15 @@ class CGame {
         //     },
         // };
 
+        /**
+         * @property isPossibleToWin
+         * Property to determine if the game is possible to win
+         * if TRUE = AI Paddle will have additional random value which help player to achieve points in the
+         * because the AI Paddle will no track the ball in correct way
+         * if FALSE = AI Paddle will track the ball in correct way, impossible to win and achieve points
+         */
+        this.isPossibleToWin = false;
+
         this.collisionZones = {
             top: {
                 yPoint: 1 /* NOT 0, because of design margin gap 1px in canvas box */,
@@ -89,8 +97,6 @@ class CGame {
                 xPoint: ( this.getCenterOfElement("paddles").player.fromXPos - (this.paddles.width / 2) ) + this.ball.width,
             },
         };
-
-        this.lastRandDir = null;
     }
 
     // drawPlayersNames() {
@@ -180,14 +186,25 @@ class CGame {
     }
 
     resetGameRound() {
+        /**
+         * reset the game round 
+         * with values from @this Class constructor
+         */
+
         this.startPongTrigger = false;
-        this.ball.firstBallThrown = false;
+        this.ball.detectedCollision = null;
+        this.ball.previousCollision = null;
         this.ball.lastThrowFrom = null;
-        this.ball.previousThrowFrom = null;
-        this.ball.detectedCollision = "none";
+        this.ball.firstBallThrown = false;
+        this.ball.addSpeedX = 1;
+        this.ball.randDir = "up";
     }
 
     detectCollision() {
+        // store previous collision
+        this.ball.previousCollision = this.ball.detectedCollision;
+
+
         // top Wall from Player Side
         if (this.ball.actualPosY <= this.collisionZones.top.yPoint && this.ball.lastThrowFrom === "playerPaddle") {
             this.ball.detectedCollision = "topFromPlayerSide";
@@ -213,7 +230,6 @@ class CGame {
             this.ball.actualPosY >= this.paddles.player.actualPosY && 
             this.ball.actualPosY <= ( (this.paddles.player.actualPosY + this.paddles.height) - this.ball.height ) ) 
         {
-            this.ball.previousThrowFrom = this.ball.lastThrowFrom;
             this.ball.lastThrowFrom = "playerPaddle";
             this.ball.detectedCollision = "playerPaddle";
         }
@@ -223,7 +239,6 @@ class CGame {
             this.ball.actualPosY >= this.paddles.AI.actualPosY && 
             this.ball.actualPosY <= ( (this.paddles.AI.actualPosY + this.paddles.height) - this.ball.height ) ) 
         {
-            this.ball.previousThrowFrom = this.ball.lastThrowFrom;
             this.ball.lastThrowFrom = "AIPaddle";
             this.ball.detectedCollision = "AIPaddle";
         }
@@ -244,9 +259,8 @@ class CGame {
             this.resetGameRound();
         }
 
- 
-        
-        // if we catch a last collision we should actually rebound the that ball to next position so
+
+        // caught collision and rebound ball to next position
         this.reboundBall(this.ball.detectedCollision);
     }
 
@@ -266,10 +280,8 @@ class CGame {
          * 
          */
         
-
-        if (collisionZone !== "none") {
+        if (this.ball.previousCollision !== collisionZone)
             this.ball.addSpeedX = this.getRandomBallSpeedFactor();
-        }
 
         switch (collisionZone) {
             case "topFromPlayerSide":
@@ -294,34 +306,22 @@ class CGame {
 
             case "playerPaddle":
                 this.ball.actualPosX -= this.ball.addSpeedX + this.ball.weight;
+                
+                if (this.ball.previousCollision !== collisionZone)
+                    this.ball.randDir = this.getRandomBallDirection("playerPaddle").directionDesc;
 
-                this.ball.randDir = this.getRandomBallDirection("playerPaddle").directionDesc;
                 (this.ball.randDir === "up") ? this.ball.actualPosY -= this.ball.weight : this.ball.actualPosY += this.ball.weight;
                 break;
 
             case "AIPaddle":
                 this.ball.actualPosX += this.ball.addSpeedX + this.ball.weight;
 
-                this.ball.randDir = this.getRandomBallDirection("AIPaddle").directionDesc;
+                if (this.ball.previousCollision !== collisionZone)
+                    this.ball.randDir = this.getRandomBallDirection("AIPaddle").directionDesc;
+
                 (this.ball.randDir === "up") ? this.ball.actualPosY += this.ball.weight : this.ball.actualPosY -= this.ball.weight;
                 break;
-            
-            case "none":
-                (this.ball.lastThrowFrom === "playerPaddle") 
-                    ? this.ball.actualPosX -= this.ball.addSpeedX + this.ball.weight
-                    : this.ball.actualPosX += this.ball.addSpeedX + this.ball.weight;
-
-                (this.ball.lastThrowFrom === "playerPaddle") 
-                    ? (this.ball.randDir === "up") 
-                        ? this.ball.actualPosY += this.ball.weight 
-                        : this.ball.actualPosY -= this.ball.weight
-                    : (this.ball.randDir === "up") 
-                        ? this.ball.actualPosY -= this.ball.weight 
-                        : this.ball.actualPosY += this.ball.weight;
-
-                break;
         }
-        console.log(collisionZone);
 
         this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
     }
@@ -336,7 +336,8 @@ class CGame {
                 : this.ball.actualPosY += this.ball.weight;
             
             this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
-
+            
+            this.ball.detectedCollision = "playerPaddle";
             this.ball.lastThrowFrom = "playerPaddle";
 
             this.ball.firstBallThrown = true;

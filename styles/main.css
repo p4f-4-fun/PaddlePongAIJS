@@ -1,7 +1,7 @@
 /* global-variables-and-mixins */
 /* /global-variables-and-mixins */
 /* simple-css-reset */
-* {
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;

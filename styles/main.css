@@ -1,0 +1,215 @@
+/* global-variables-and-mixins */
+/* /global-variables-and-mixins */
+/* simple-css-reset */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+  overflow: hidden;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}
+
+/* /simple-css-reset */
+/* single classes */
+.hidden {
+  display: none !important;
+}
+
+.hiddenByTransformXLeft, .hiddenByTransformXRight {
+  transition: all 150ms ease-in-out !important;
+  transform: translateX(-9999px) !important;
+  transform: translateX(-100vw) !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+.hiddenByTransformXRight {
+  transform: translateX(9999px) !important;
+  transform: translateX(100vw) !important;
+}
+
+.cursorNone {
+  cursor: none !important;
+}
+
+/* /single classes */
+/* app-css */
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-family: "Barlow Semi Condensed", sans-serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: #FFFFFF;
+  background: rgb(34, 34, 126);
+  background: -moz-radial-gradient(at top, rgb(34, 34, 126) 0%, rgb(10, 10, 40) 65%);
+  background: -webkit-radial-gradient(at top, rgb(34, 34, 126) 0%, rgb(10, 10, 40) 65%);
+  background: radial-gradient(at top, rgb(34, 34, 126) 0%, rgb(10, 10, 40) 65%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#22227e",endColorstr="#0a0a28",GradientType=1);
+  height: 100vh;
+  min-height: 100vh;
+  width: 100vw;
+  min-width: 100vw;
+  color: #FFFFFF;
+}
+
+.container {
+  margin: 0 auto;
+  margin-top: 20px;
+  max-width: 900px;
+}
+.container .header {
+  width: 100%;
+  min-width: 100%;
+  padding: 15px 20px;
+  border-radius: 4px;
+  border: none;
+  border: 2px solid #FFFFFF;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  -webkit-box-shadow: inset 0px 0px 10px 0px rgb(0, 0, 0);
+  -moz-box-shadow: inset 0px 0px 10px 0px rgb(0, 0, 0);
+  box-shadow: inset 0px 0px 10px 0px rgb(0, 0, 0);
+}
+.container .header .header--span {
+  display: block;
+  line-height: 2.8rem;
+}
+.container .header .header--playerNameBox > pre {
+  font-family: "Barlow Semi Condensed", sans-serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 1.8rem;
+  word-spacing: 4px;
+}
+.container .header .header--leaderboard {
+  min-height: 80px;
+  font-weight: 900;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.container .header .header--leaderboard > span {
+  display: block;
+}
+.container .header .header--leaderboard > .header--leaderboard__span {
+  font-size: 2.2rem;
+  letter-spacing: 2px;
+}
+.container .header .header--leaderboard > .header--leaderboard__span + .header--leaderboard__span__score {
+  font-size: 5.4rem;
+  min-height: 66px;
+  transition: transform 1500ms linear;
+}
+.container .game {
+  margin: 0 auto;
+  margin-top: 20px;
+  max-width: 900px;
+  min-height: 500px;
+  border-radius: 4px;
+  border: none;
+  border: 2px solid #FFFFFF;
+}
+.container .game > .game--container {
+  width: 100%;
+  min-width: 100%;
+  height: 100%;
+  min-height: 100%;
+  -webkit-box-shadow: inset 0px 0px 10px 0px rgb(0, 0, 0);
+  -moz-box-shadow: inset 0px 0px 10px 0px rgb(0, 0, 0);
+  box-shadow: inset 0px 0px 10px 0px rgb(0, 0, 0);
+  position: relative;
+}
+.container .game > .game--container > #game--container__gameBoardLineDiv {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  width: 100%;
+  min-width: 100%;
+  height: 100%;
+  min-height: 100%;
+  background-image: -moz-radial-gradient(#FFFFFF 2px, transparent 0);
+  background-image: -webkit-radial-gradient(#FFFFFF 2px, transparent 0);
+  background-image: radial-gradient(#FFFFFF 2px, transparent 0);
+  background-size: 10px 10px;
+  background-repeat: repeat-y;
+  background-position: 50%;
+}
+.container .game > .game--container > .game--container__canvasInputModal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  row-gap: 40px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  min-width: 100%;
+  height: 100%;
+  min-height: 100%;
+  transition: all 150ms linear;
+}
+.container .game > .game--container > .game--container__canvasInputModal > input {
+  border: none;
+  border-bottom: 2px solid #FFFFFF;
+  background: none;
+  outline: none;
+  color: #FFFFFF;
+  width: 50%;
+  min-width: 50%;
+  font-size: 2.2rem;
+  letter-spacing: 1px;
+  text-align: center;
+}
+.container .game > .game--container > .game--container__canvasInputModal > input::placeholder {
+  font-size: 1.6rem;
+  text-align: center;
+  color: inherit;
+}
+.container .game > .game--container > .game--container__canvasInputModal > button {
+  display: block;
+  background: none;
+  outline: none;
+  border: none;
+  padding: 0 20px;
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: #FFFFFF;
+  cursor: pointer;
+}
+.container .game > .game--container > .game--container__canvasInputModal > button::after {
+  content: "";
+  display: block;
+  position: relative;
+  left: 0;
+  top: 0;
+  height: 2px;
+  min-height: 2px;
+  background-color: #FFFFFF;
+  scale: 1;
+  transform: translateX(-120px);
+  transition: transform 150ms linear, scale 150ms linear;
+}
+.container .game > .game--container > .game--container__canvasInputModal > button:hover {
+  scale: 1.05;
+}
+.container .game > .game--container > .game--container__canvasInputModal > button:hover::after {
+  transform: translateX(0px);
+}
+
+/* /app-css */
+
+/*# sourceMappingURL=main.css.map */

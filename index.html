@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- external fonts - google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+    <!-- For all other and apple -->
+    <link rel="icon" type="image/png" sizes="128x128" href="./assets/favicon.png">
+    <link rel="apple-touch-icon" type="image/png" sizes="128x128" href="./assets/favicon.png">
+
+    <!-- stylesheets -->
+    <link rel="stylesheet" href="./styles/main.css">
+    <title>Paddle Pong AI 2D | Vanila JS</title>
+</head>
+<body>
+    <!-- app -->
+    <div class="container">
+        <header>
+            <div class="header">
+                <h1>
+                    <span class="header--span">PADDLE</span>
+                    <span class="header--span">PONG</span>
+                    <span class="header--span">AI 2D</span>
+                </h1>
+                <div class="header--playerNameBox">
+                    <pre>AI vs <span class="header--playerNameBox__span"></span></pre>
+                </div>
+                <div class="header--leaderboard">
+                    <span class="header--leaderboard__span">Score</span>
+                    <span class="header--leaderboard__span__score hiddenByTransformXLeft"></span>
+                </div>
+            </div>
+        </header>
+        <main>
+            <section class="game">
+                <div class="game--container">
+                    <canvas id="game--container__canvas" width="896" height="494"></canvas>
+                    <div class="hidden" id="game--container__gameBoardLineDiv"></div>
+                    <div class="game--container__canvasInputModal hidden hiddenByTransformXLeft">
+                        <input type="text" name="playerName" alt="Player name" maxlength="17" placeholder="Enter your player name:" id="game--container__canvasInputModal__input" required>
+                        <button type="button" id="game--container__canvasInputModal__button">PLAY</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <!-- /app -->
+
+    <!-- scripts -->
+    <script type="module" src="./js/app.js"></script>
+</body>
+</html>
+
+

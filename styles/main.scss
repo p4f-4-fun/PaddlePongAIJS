@@ -1,0 +1,167 @@
+@use 'globals';
+
+/* app-css */
+html {
+    font-size: 62.5%;
+}
+
+body {
+    @include globals.fontBase;
+
+    background: rgb(34,34,126);
+    background: -moz-radial-gradient(at top, rgba(34,34,126,1) 0%, rgba(10,10,40,1) 65%);
+    background: -webkit-radial-gradient(at top, rgba(34,34,126,1) 0%, rgba(10,10,40,1) 65%);
+    background: radial-gradient(at top, rgba(34,34,126,1) 0%, rgba(10,10,40,1) 65%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#22227e",endColorstr="#0a0a28",GradientType=1);
+
+    height: 100vh;
+    min-height: 100vh;
+    width: 100vw;
+    min-width: 100vw;
+
+    color: globals.$colorMain;
+}
+
+.container {
+    margin: 0 auto;
+    margin-top: 20px;
+    max-width: 900px;
+
+    & .header {
+        width: 100%;
+        min-width: 100%;
+        padding: 15px 20px;
+        @include globals.borderType1;
+        @include globals.d-flex-row;
+        @include globals.boxShadow;
+
+        & .header--span {
+            display: block;
+            line-height: 2.8rem;
+        }
+
+        & .header--playerNameBox {
+            & > pre {
+                @include globals.fontBase;
+                font-weight: 600;
+                font-size: 1.8rem;
+                word-spacing: 4px;
+            }
+        }
+
+        & .header--leaderboard {
+            min-height: 80px;
+            font-weight: 900;
+            @include globals.d-flex-column;
+
+            & > span {
+                display: block;
+            }
+
+            & > .header--leaderboard__span {
+                font-size: 2.2rem;
+                letter-spacing: 2px;
+
+                & + .header--leaderboard__span__score {
+                    font-size: 5.4rem;
+                    min-height: 66px;
+                    transition: transform globals.$transitionLongDuration globals.$transitionTimingFunction;
+                }
+            }
+        }
+    }
+
+    .game {
+        margin: 0 auto;
+        margin-top: 20px;
+        max-width: 900px;
+        min-height: 500px;
+        @include globals.borderType1;
+
+        & > .game--container {
+            @include globals.widthHeight100prcnt;
+            @include globals.boxShadow;
+            position: relative;
+
+            & > #game--container__gameBoardLineDiv {
+                position: absolute;
+                left: 0;
+                top: 0;
+                z-index: -1;
+                @include globals.widthHeight100prcnt;
+                background-image: -moz-radial-gradient(globals.$backgroundColorFromColorMain 2px, transparent 0);
+                background-image: -webkit-radial-gradient(globals.$backgroundColorFromColorMain 2px, transparent 0);
+                background-image: radial-gradient(globals.$backgroundColorFromColorMain 2px, transparent 0);
+                background-size: 10px 10px;
+                background-repeat: repeat-y;
+                background-position: 50%;
+            }
+            
+            & > .game--container__canvasInputModal {
+                @include globals.d-flex-column;
+                row-gap: 40px;
+                position: absolute;
+                left: 0;
+                top: 0;
+                @include globals.widthHeight100prcnt;
+                transition: all globals.$transitionDuration globals.$transitionTimingFunction;
+
+                & > input {
+                    @include globals.borderType2;
+                    background: none;
+                    outline: none;
+                    color: globals.$colorMain;
+                    width: 50%;
+                    min-width: 50%;
+                    font-size: 2.2rem;
+                    letter-spacing: 1px;
+                    text-align: center;
+
+                    &::placeholder {
+                        font-size: 1.6rem;
+                        text-align: center;
+                        color: inherit;
+                    }
+
+                }
+                & > button {
+                    display: block;
+                    background: none;
+                    outline: none;
+                    border: none;
+                    padding: 0 20px;
+                    font-size: 2.4rem;
+                    font-weight: 900;
+                    color: globals.$colorMain;
+                    cursor: pointer;
+                    
+                    &::after {
+                        content: "";
+                        display: block;
+                        position: relative;
+                        left: 0;
+                        top: 0;
+                        height: 2px;
+                        min-height: 2px;
+                        background-color: globals.$colorMain;
+                        scale: 1;
+                        transform: translateX(-120px);
+                        transition: transform globals.$transitionDuration globals.$transitionTimingFunction, scale globals.$transitionDuration globals.$transitionTimingFunction;
+
+                    }
+
+                    &:hover {
+                        scale: 1.05;
+                        &::after {
+                            transform: translateX(0px);
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+}
+/* /app-css */
+
+

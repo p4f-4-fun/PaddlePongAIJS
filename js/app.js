@@ -55,7 +55,7 @@ const gameLoop = () => {
         
         // 60 fps per second [1000ms] = ~16.67ms per frame, 
         // but this option is little laggy anyway..
-        //setTimeout(gameLoop, (1000/ 60));
+        //setTimeout(gameLoop, (1000/ 90));
         requestAnimationFrame(gameLoop);
     }
 };

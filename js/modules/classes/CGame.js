@@ -2,7 +2,7 @@
  * @import
  * 
  */
-import { domCtx, ctx, gameStatus, drawProperties, OCPlayer, OCCursor, OCGameView } from "./../globals/globals.js";
+import { ctx, domCtx, drawProperties, gameStatus, OCCursor, OCGameView, OCPlayer } from "./../globals/globals.js";
 
 
 
@@ -55,22 +55,6 @@ class CGame {
             randDir: "up",
         };
 
-        // this.lineDivider = {
-        //     width: 4,
-        // };
-
-        // this.playerNamesDrawingPosition = {
-        //     playerName: {
-        //         posX: 460,
-        //         posY: 25,
-        //     },
-
-        //     AIName: {
-        //         posX: 414,
-        //         posY: 25,
-        //     },
-        // };
-
         /**
          * @property isPossibleToWin
          * Property to determine if the game is possible to win
@@ -99,17 +83,6 @@ class CGame {
         };
     }
 
-    // drawPlayersNames() {
-    //     ctx.fillStyle = `${drawProperties.UI.color}`;
-    //     ctx.font = `${drawProperties.fontRegular.fontWeightBold} ${drawProperties.fontRegular.fontSize} ${drawProperties.fontRegular.fontFamily}`;
-
-    //     // player name draw position
-    //     ctx.fillText(`${OCPlayer.playerName}`, this.playerNamesDrawingPosition.playerName.posX, this.playerNamesDrawingPosition.playerName.posY);
-
-    //     // ai name draw position
-    //     ctx.fillText("AI", this.playerNamesDrawingPosition.AIName.posX, this.playerNamesDrawingPosition.AIName.posY);
-    // }
-
     drawPlayerPaddle(playerPaddleX, playerPaddleY) {
         ctx.fillStyle = `${drawProperties.UI.color}`;
         ctx.fillRect(playerPaddleX, playerPaddleY, this.paddles.width, this.paddles.height);
@@ -119,14 +92,6 @@ class CGame {
         ctx.fillStyle = `${drawProperties.UI.color}`;
         ctx.fillRect(AIPaddleX, AIPaddleY, this.paddles.width, this.paddles.height);
     }
-    
-    // drawLineDivider() {
-    //     ctx.fillStyle = `${drawProperties.UI.color}`;
-
-    //     for (let _iiterator = 3; _iiterator < domCtx.height; _iiterator += (2 * this.ball.height) /* margin gap */) {
-    //         ctx.fillRect( ( (domCtx.width / 2) - (this.lineDivider.width / 2) ), _iiterator /* margin gap */, this.lineDivider.width, this.ball.height);
-    //     }
-    // }
 
     drawBall(ballX, ballY) {
         ctx.fillStyle = `${drawProperties.UI.ballColor}`;
@@ -166,18 +131,10 @@ class CGame {
         const rand = Math.random() < 0.5 ? 0 : 1;
 
         if (whoTriggered === "playerPaddle") {
-            return {
-                directionDesc: rand === 0 ? "down" : "up",
-            };
-        }
-
-        else if (whoTriggered === "AIPaddle") {
-            return {
-                directionDesc: rand === 0 ? "up" : "down",
-            };
-        }
-
-        else {
+            return { directionDesc: rand === 0 ? "down" : "up", };
+        } else if (whoTriggered === "AIPaddle") {
+            return { directionDesc: rand === 0 ? "up" : "down", };
+        } else {
             return Math.random() < 0.5 ? 0 : 1;
         }
     }
@@ -226,19 +183,21 @@ class CGame {
         } 
 
         // Player Paddle
-        else if ( this.ball.actualPosX >= (this.getCenterOfElement("paddles").player.fromXPos - (this.paddles.width / 2) - this.ball.width - 1/*-1 = margin gap*/) &&
+        else if ( 
+            this.ball.actualPosX >= (this.getCenterOfElement("paddles").player.fromXPos - (this.paddles.width / 2) - this.ball.width - 1/*-1 = margin gap*/) &&
             this.ball.actualPosY >= this.paddles.player.actualPosY && 
-            this.ball.actualPosY <= ( (this.paddles.player.actualPosY + this.paddles.height) - this.ball.height ) ) 
-        {
+            this.ball.actualPosY <= ( (this.paddles.player.actualPosY + this.paddles.height) - this.ball.height ) 
+        ) {
             this.ball.lastThrowFrom = "playerPaddle";
             this.ball.detectedCollision = "playerPaddle";
         }
 
         // AI Paddle
-        else if ( this.ball.actualPosX <= (this.getCenterOfElement("paddles").AI.fromXPos + (this.paddles.width / 2) + 1/*1 = margin gap*/) &&
+        else if ( 
+            this.ball.actualPosX <= (this.getCenterOfElement("paddles").AI.fromXPos + (this.paddles.width / 2) + 1/*1 = margin gap*/) &&
             this.ball.actualPosY >= this.paddles.AI.actualPosY && 
-            this.ball.actualPosY <= ( (this.paddles.AI.actualPosY + this.paddles.height) - this.ball.height ) ) 
-        {
+            this.ball.actualPosY <= ( (this.paddles.AI.actualPosY + this.paddles.height) - this.ball.height ) 
+        ) {
             this.ball.lastThrowFrom = "AIPaddle";
             this.ball.detectedCollision = "AIPaddle";
         }
@@ -266,7 +225,8 @@ class CGame {
 
     reboundBall(collisionZone) {
         /**
-         * collision situations and positions change when it happens
+         * Collision situations and positions change when it happens - we always rebound the ball from player/ai to opponent side
+         * becasue the come back is non-sense imho
          * Ball from Player side
          * ----------------------
          * Top wall: x--, y++
@@ -310,7 +270,9 @@ class CGame {
                 if (this.ball.previousCollision !== collisionZone)
                     this.ball.randDir = this.getRandomBallDirection("playerPaddle").directionDesc;
 
-                (this.ball.randDir === "up") ? this.ball.actualPosY -= this.ball.weight : this.ball.actualPosY += this.ball.weight;
+                (this.ball.randDir === "up") 
+                    ? this.ball.actualPosY -= this.ball.weight 
+                    : this.ball.actualPosY += this.ball.weight;
                 break;
 
             case "AIPaddle":
@@ -319,7 +281,9 @@ class CGame {
                 if (this.ball.previousCollision !== collisionZone)
                     this.ball.randDir = this.getRandomBallDirection("AIPaddle").directionDesc;
 
-                (this.ball.randDir === "up") ? this.ball.actualPosY += this.ball.weight : this.ball.actualPosY -= this.ball.weight;
+                (this.ball.randDir === "up") 
+                    ? this.ball.actualPosY += this.ball.weight 
+                    : this.ball.actualPosY -= this.ball.weight;
                 break;
         }
 
@@ -347,41 +311,23 @@ class CGame {
     }
 
     startGameBall() {
-        if(gameStatus.isStarted === true && 
-            gameStatus.isPaused === false && 
-            this.startPongTrigger === false) 
-        {
+        if (gameStatus.isStarted === true && gameStatus.isPaused === false && this.startPongTrigger === false)
             this.startPongTrigger = true;
-        }
     }
 
     computeAIPaddlePosYViaBallPosYTracking() {
+        // TODO isPossibleToWin implementation.. in V2 version
         const ballActualPosY = this.ball.actualPosY;
         return ballActualPosY;
     }
-
-    isPaddleBoundaryCollision(posYwhenInvoke, whosInvoke) {
-        const paddlesPlayerActualPosY = this.paddles.player.actualPosY;
-        const paddlesAIActualPosY = this.paddles.AI.actualPosY;
-        const _posYwhenInvoke = posYwhenInvoke;
-        const _whosInvoke = whosInvoke;
-        
-        const actualPosY = (_whosInvoke === "player") ? paddlesPlayerActualPosY : paddlesAIActualPosY;
-        
-        return ( 
-            _posYwhenInvoke <= (this.collisionZones.top.yPoint - this.ball.height) || 
-            _posYwhenInvoke >= (this.collisionZones.bottom.yPoint + (this.paddles.height / 2) + this.ball.height) 
-        )   ? actualPosY 
-            : _posYwhenInvoke;
-    }
-
+    
     drawUI() {
         // paddle posititiong player
-        this.paddles.player.actualPosY = ( this.isPaddleBoundaryCollision( OCCursor.cursorPosition.y, "player" ) - (this.paddles.height / 2) );
+        this.paddles.player.actualPosY = OCCursor.cursorPosition.y - (this.paddles.height / 2);
         this.drawPlayerPaddle(this.paddles.player.constPosX, this.paddles.player.actualPosY);
 
         // paddle posititiong 
-        this.paddles.AI.actualPosY = ( this.isPaddleBoundaryCollision( this.computeAIPaddlePosYViaBallPosYTracking(), "AI" ) - (this.paddles.height / 2) );
+        this.paddles.AI.actualPosY = this.computeAIPaddlePosYViaBallPosYTracking() - (this.paddles.height / 2);
         this.drawAIPaddle(this.paddles.AI.constPosX, this.paddles.AI.actualPosY);
 
         // ball positioning 
@@ -390,9 +336,7 @@ class CGame {
             this.ball.actualPosY = this.getCenterOfElement("paddles").player.fromYPos - this.ball.height / 2;
             
             this.drawBall(this.ball.actualPosX, this.ball.actualPosY);
-        }
-
-        else {
+        } else {
             this.throwBall();
         }
     }

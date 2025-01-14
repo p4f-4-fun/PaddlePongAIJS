@@ -4,8 +4,8 @@
  * @import
  * 
  */
-import { isDEVMode, domCtx, ctx, gameStatus, OCGameView, OCGame } from "./modules/globals/globals.js";
-import pageEventsBinding from './modules/globals/bindings.js';
+import { ctx, domCtx, gameStatus, isDEVMode, OCGame, OCGameView  } from "./modules/globals/globals.js";
+import pageEventsBinding from "./modules/globals/bindings.js";
 
 
 
@@ -53,11 +53,15 @@ const gameLoop = () => {
             OCGame.drawUI();
         }
         
-        setTimeout(gameLoop, (1000/* 3150ms/ 1sec *// 65/*frames per seconds*/));
-        //requestAnimationFrame(gameLoop);
+        // 60 fps per second [1000ms] = ~16.67ms per frame, 
+        // but this option is little laggy anyway..
+        //setTimeout(gameLoop, (1000/ 60));
+        requestAnimationFrame(gameLoop);
     }
 };
 // /MAIN GAME APP FUNCTION
+
+
 
 /**
  * @export

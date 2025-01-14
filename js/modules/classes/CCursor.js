@@ -2,7 +2,7 @@
  * @import
  * 
  */
-import { isDEVMode } from "./../globals/globals.js";
+import { domCtx } from "./../globals/globals.js";
 
 
 
@@ -13,20 +13,11 @@ import { isDEVMode } from "./../globals/globals.js";
  */
 class CCursor {
     constructor() {
-        this.cursorPosition = {
-            y: 0,
-        };
+        this.cursorPosition = { y: 0, };
     }
 
     updateCursorPosition (Event) {
-        // if domCtx event
-        this.cursorPosition.y = Event.offsetY;
-        
-        // console log only in dev mode
-        // if (isDEVMode) {
-        //     // if domCtx event
-        //     console.log(`[${ parseInt(Event.OffsetX) }, ${ parseInt(Event.offsetY) }]`);
-        // }
+        this.cursorPosition.y = Event.clientY - domCtx.getBoundingClientRect().top;
     }
 }
 

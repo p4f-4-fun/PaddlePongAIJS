@@ -2,7 +2,7 @@
  * @import
  * 
  */
-import { isDEVMode, dom, domElementsStack, domCtx, ctx, gameStatus, drawProperties, OCPlayer, OCGameView } from "./../globals/globals.js";
+import { ctx, dom, domCtx, domElementsStack, drawProperties, gameStatus, OCGameView, OCPlayer } from "./../globals/globals.js";
 import gameLoop from "./../../app.js";
 
 
@@ -39,9 +39,7 @@ class CGameView {
     renderPlayerNamePreview() {
         if (OCGameView.isModalElementInputValueValid()) {
             domElementsStack.playerNamePreviewElement.innerHTML = domElementsStack.modalElementInput.value;
-        } 
-        
-        else {
+        } else {
             domElementsStack.modalElementInput.value = "";
 
             OCGameView.renderPlayerNamePreviewOnce();
@@ -71,26 +69,21 @@ class CGameView {
             domElementsStack.modalElementInput.removeEventListener("input", OCGameView.renderPlayerNamePreview);
             domElementsStack.modalElementInput.removeEventListener('propertychange', OCGameView.renderPlayerNamePreview);
 
+            // clear all elements in modal element just to be sure
             domElementsStack.modalElement.innerHTML = "";
             
             domElementsStack.gameContainer.removeChild(domElementsStack.modalElement);
         }, this.setTimeoutDuration);
-
-        // cursor none for UX
-        // if (isDEVMode === false) {
-        //     domElementsStack.gameContainer.classList.add("cursorNone");
-        // }
-
-        domElementsStack.gameContainer.classList.add("cursorNone");
     }
     
     prepareGameBoard() {
-        if (this.wasPlayerNameInputModalOpen === true) {
-            this.removeViewPlayerNameInputModal();
-        }
+        (this.wasPlayerNameInputModalOpen) && this.removeViewPlayerNameInputModal();
 
         // Gameboard line divider div display on screen
         domElementsStack.gameBoardLineDiv.classList.remove("hidden");
+
+        // add custom cursor move to HTML [documentElement] element
+        document.documentElement.classList.add("cursorMove");
         
         gameStatus.isStarted = true;
         gameLoop();
@@ -99,39 +92,31 @@ class CGameView {
     isModalElementInputValueValid() {
         if (!domElementsStack.modalElementInput.validity.valid) {
             return false;
-        }
-
-        else if (domElementsStack.modalElementInput.validity.valueMissing) {
+        } else if (domElementsStack.modalElementInput.validity.valueMissing) {
             return false;
-        }
-        
-        else if (domElementsStack.modalElementInput.value.startsWith(" ")) {
+        } else if (domElementsStack.modalElementInput.value.startsWith(" ")) {
             return false;
-        } 
-        
-        else {
+        } else {
             return true;
         }
     }
 
     playButtonTriggered(Event) {
-        if(OCGameView.isPlayButtonTriggered === false) {
+        if(this.isPlayButtonTriggered === false) {
             Event.preventDefault();
             Event.stopImmediatePropagation();
 
-            if (OCGameView.isModalElementInputValueValid()) {
+            if (this.isModalElementInputValueValid()) {
                 // change status of PLAY Button to avoid any (multiple) actions after modal element remove
-                OCGameView.isPlayButtonTriggered = true;
+                this.isPlayButtonTriggered = true;
                 
                 // if input with name is valid, then update player's name and prepare game board
                 OCPlayer.playerName = domElementsStack.modalElementInput.value;
 
                 // prepare game canvas and render game now
-                OCGameView.prepareGameBoard();
-            }
-
-            else {
-                OCGameView.isPlayButtonTriggered = false;
+                this.prepareGameBoard();
+            } else {
+                this.isPlayButtonTriggered = false;
             }
         }
     }
@@ -141,7 +126,8 @@ class CGameView {
         if (gameStatus.isStarted) {
             // [SPACE] key with "32" key number is used to pause/ resume game
             if (Event.which === 32 || Event.keyCode === 32 || Event.key === " " || Event.code === "Space") {
-                gameStatus.isPaused = gameStatus.isPaused ? false : true;
+                // Toggle isPaused state
+                gameStatus.isPaused = !gameStatus.isPaused;
 
                 if (gameStatus.isPaused) {
                     ctx.fillStyle = `${drawProperties.fontWarrning.fontColor}`;

@@ -5,8 +5,9 @@
  */
 class CPlayer {
     #playerLSData = {};  /* Local Storage data for player */
+
     constructor() {
-        this.defaultPlayerName = "Unknown",
+        this.defaultPlayerName = "Unknown";
         this.#playerLSData = {
             playerName: localStorage.getItem("playerName") || this.defaultPlayerName,
             playerScore: localStorage.getItem("playerScore") || 0, 

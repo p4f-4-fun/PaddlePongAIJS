@@ -6,20 +6,20 @@ html {
 }
 
 body {
-    @include globals.fontBase;
-
     background: rgb(34,34,126);
     background: -moz-radial-gradient(at top, rgba(34,34,126,1) 0%, rgba(10,10,40,1) 65%);
     background: -webkit-radial-gradient(at top, rgba(34,34,126,1) 0%, rgba(10,10,40,1) 65%);
     background: radial-gradient(at top, rgba(34,34,126,1) 0%, rgba(10,10,40,1) 65%);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#22227e",endColorstr="#0a0a28",GradientType=1);
-
+    
+    color: globals.$colorMain;
+    @include globals.fontBase;
+    
     height: 100vh;
     min-height: 100vh;
     width: 100vw;
     min-width: 100vw;
 
-    color: globals.$colorMain;
 }
 
 .container {
@@ -28,12 +28,12 @@ body {
     max-width: 900px;
 
     & .header {
+        @include globals.borderType1;
+        @include globals.boxShadow;
+        @include globals.d-flex-row;
+        padding: 15px 20px;
         width: 100%;
         min-width: 100%;
-        padding: 15px 20px;
-        @include globals.borderType1;
-        @include globals.d-flex-row;
-        @include globals.boxShadow;
 
         & .header--span {
             display: block;
@@ -50,9 +50,9 @@ body {
         }
 
         & .header--leaderboard {
-            min-height: 80px;
-            font-weight: 900;
             @include globals.d-flex-column;
+            font-weight: 900;
+            min-height: 80px;
 
             & > span {
                 display: block;
@@ -72,86 +72,86 @@ body {
     }
 
     .game {
+        @include globals.borderType1;
+        min-height: 500px;
         margin: 0 auto;
         margin-top: 20px;
         max-width: 900px;
-        min-height: 500px;
-        @include globals.borderType1;
 
         & > .game--container {
-            @include globals.widthHeight100prcnt;
             @include globals.boxShadow;
             position: relative;
+            transform: scale(0.975);
+            @include globals.widthHeight100prcnt;
 
             & > #game--container__gameBoardLineDiv {
-                position: absolute;
-                left: 0;
-                top: 0;
-                z-index: -1;
-                @include globals.widthHeight100prcnt;
                 background-image: -moz-radial-gradient(globals.$backgroundColorFromColorMain 2px, transparent 0);
                 background-image: -webkit-radial-gradient(globals.$backgroundColorFromColorMain 2px, transparent 0);
                 background-image: radial-gradient(globals.$backgroundColorFromColorMain 2px, transparent 0);
-                background-size: 10px 10px;
-                background-repeat: repeat-y;
                 background-position: 50%;
+                background-repeat: repeat-y;
+                background-size: 10px 10px;
+                left: 0;
+                position: absolute;
+                top: 0;
+                @include globals.widthHeight100prcnt;
+                z-index: -1;
             }
             
             & > .game--container__canvasInputModal {
                 @include globals.d-flex-column;
-                row-gap: 40px;
-                position: absolute;
                 left: 0;
+                position: absolute;
+                row-gap: 40px;
                 top: 0;
-                @include globals.widthHeight100prcnt;
                 transition: all globals.$transitionDuration globals.$transitionTimingFunction;
+                @include globals.widthHeight100prcnt;
 
                 & > input {
-                    @include globals.borderType2;
                     background: none;
-                    outline: none;
+                    @include globals.borderType2;
                     color: globals.$colorMain;
-                    width: 50%;
-                    min-width: 50%;
                     font-size: 2.2rem;
                     letter-spacing: 1px;
+                    outline: none;
                     text-align: center;
+                    width: 50%;
+                    min-width: 50%;
 
                     &::placeholder {
+                        color: inherit;
                         font-size: 1.6rem;
                         text-align: center;
-                        color: inherit;
                     }
 
                 }
                 & > button {
-                    display: block;
                     background: none;
-                    outline: none;
                     border: none;
-                    padding: 0 20px;
-                    font-size: 2.4rem;
-                    font-weight: 900;
                     color: globals.$colorMain;
                     cursor: pointer;
+                    display: block;
+                    font-size: 2.4rem;
+                    font-weight: 900;
+                    outline: none;
+                    padding: 0 20px;
                     
                     &::after {
+                        background-color: globals.$colorMain;
                         content: "";
                         display: block;
-                        position: relative;
-                        left: 0;
-                        top: 0;
                         height: 2px;
                         min-height: 2px;
-                        background-color: globals.$colorMain;
-                        scale: 1;
-                        transform: translateX(-120px);
+                        left: 0;
+                        position: relative;
+                        top: 0;
+                        transform: scale(1) translateX(-120px);
                         transition: transform globals.$transitionDuration globals.$transitionTimingFunction, scale globals.$transitionDuration globals.$transitionTimingFunction;
 
                     }
 
                     &:hover {
-                        scale: 1.05;
+                        transform: scale(1.05);
                         &::after {
                             transform: translateX(0px);
                         }

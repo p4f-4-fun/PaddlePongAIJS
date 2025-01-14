@@ -2,10 +2,10 @@
  * @import
  * 
  */
-import CPlayer from './../classes/CPlayer.js';
-import CCursor from './../classes/CCursor.js';
-import CGameView from './../classes/CGameView.js';
-import CGame from './../classes/CGame.js';
+import CCursor from "./../classes/CCursor.js";
+import CGame from "./../classes/CGame.js";
+import CGameView from "./../classes/CGameView.js";
+import CPlayer from "./../classes/CPlayer.js";
 
 
 
@@ -13,18 +13,18 @@ import CGame from './../classes/CGame.js';
  * @Global variables, declarations, assignments etc...
  * 
  */
-const isDEVMode = true;
+const isDEVMode = false;
 
 const dom = document;
 const domElementsStack = {
     canvas: dom.querySelector("#game--container__canvas"),
-    scoreElement: dom.querySelector(".header--leaderboard__span__score"),
-    playerNamePreviewElement: dom.querySelector(".header--playerNameBox__span"),
+    gameBoardLineDiv: dom.querySelector("#game--container__gameBoardLineDiv"),
     gameContainer: dom.querySelector(".game--container"),
     modalElement: dom.querySelector(".game--container__canvasInputModal"),
-    modalElementInput: dom.querySelector("#game--container__canvasInputModal__input"),
     modalElementButton: dom.querySelector("#game--container__canvasInputModal__button"),
-    gameBoardLineDiv: dom.querySelector("#game--container__gameBoardLineDiv"),
+    modalElementInput: dom.querySelector("#game--container__canvasInputModal__input"),
+    playerNamePreviewElement: dom.querySelector(".header--playerNameBox__span"),
+    scoreElement: dom.querySelector(".header--leaderboard__span__score"),
 };
 
 const domCtx = domElementsStack.canvas;
@@ -37,40 +37,40 @@ let gameStatus = {
 
 const drawProperties = {
     fontRegular: {
-        fontUrl: 'url("assets/fonts/BarlowSemiCondensed-Regular.woff")',
-        fontFamily: "BarlowRegular",
         fontColor: "#FFFFFF",
+        fontFamily: "BarlowRegular",
+        fontSize: "2.2rem",
+        fontUrl: 'url("assets/fonts/BarlowSemiCondensed-Regular.woff")',
         fontWeight: "400",
         fontWeightBold: "600",
-        fontSize: "2.2rem",
     },
 
     fontWarrning: {
-        fontUrl: 'url("assets/fonts/BarlowSemiCondensed-Bold.woff")',
-        fontFamily: "BarlowBold",
         fontColor: "#FFFF00",
-        fontWeight: "800",
+        fontFamily: "BarlowBold",
         fontSize: "2.4rem",
+        fontUrl: 'url("assets/fonts/BarlowSemiCondensed-Bold.woff")',
+        fontWeight: "800",
     },
 
     UI: {
+        ballColor: "#FFFF00",
         color: "#FFFFFF",
         colorIfWarnning: "#FFFF00",
-        ballColor: "#FFFF00",
     },
 };
 
 // class objects assignments
-const OCPlayer = new CPlayer();
 const OCCursor = new CCursor();
-const OCGameView = new CGameView();
 const OCGame = new CGame();
+const OCGameView = new CGameView();
+const OCPlayer = new CPlayer();
 // /class objects assignments
 
 /**
  * @export
  * 
  */
-export { isDEVMode, dom, domElementsStack, domCtx, ctx, gameStatus, drawProperties, OCPlayer, OCCursor, OCGameView, OCGame};
+export { isDEVMode, dom, domElementsStack, domCtx, ctx, gameStatus, drawProperties, OCCursor, OCGame, OCGameView, OCPlayer};
 
 

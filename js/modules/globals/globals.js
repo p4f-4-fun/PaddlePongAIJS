@@ -13,7 +13,7 @@ import CPlayer from "./../classes/CPlayer.js";
  * @Global variables, declarations, assignments etc...
  * 
  */
-const isDEVMode = false;
+const isDEVMode = true;
 
 const dom = document;
 const domElementsStack = {

@@ -53,10 +53,10 @@ const gameLoop = () => {
             OCGame.drawUI();
         }
         
-        // 60 fps per second [1000ms] = ~16.67ms per frame, 
+        // 60/90 fps per second [1000ms] ~= 16.67/11.11ms per frame, 
         // but this option is little laggy anyway..
-        //setTimeout(gameLoop, (1000/ 90));
-        requestAnimationFrame(gameLoop);
+        setTimeout(gameLoop, (1000/ 90));
+        //requestAnimationFrame(gameLoop);
     }
 };
 // /MAIN GAME APP FUNCTION

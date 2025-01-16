@@ -39,7 +39,7 @@ const init = () => {
     OCGameView.renderPlayerNameInputModal();
 };
 
-window.onload = () => init();
+window.onload = init;
 // /INIT FUNCTION
 
 
